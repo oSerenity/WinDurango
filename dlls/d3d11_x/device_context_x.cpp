@@ -2,9 +2,12 @@
 #include <d3d11_2.h>
 #include "device_context_x.h"
 #include <stdexcept>
-
+#include <initguid.h>  // Required to define GUIDs
 #include "view.hpp"
-
+DEFINE_GUID(IID_ID3D11DeviceContextX,
+	0x48800095, 0x7134, 0x4BE7, 0x91, 0x86, 0xB8, 0x6B, 0xEC, 0xB2, 0x64, 0x77);
+DEFINE_GUID(IID_ID3D11DeviceX,
+	0x177700F9, 0x876A, 0x4436, 0xB3, 0x68, 0x36, 0xA6, 0x04, 0xF8, 0x2C, 0xEF);
 void wd::device_context_x::GetDevice(ID3D11Device** ppDevice)
 {
 	throw std::logic_error("Not implemented");

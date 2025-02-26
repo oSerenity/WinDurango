@@ -4,7 +4,8 @@
 
 #include "device_child_x.h"
 #include "device_x.h"
-
+extern const IID IID_ID3D11DeviceContextX;
+extern const IID IID_ID3D11DeviceX;
 static std::map<UINT64, int> D3D11X_HARDWARE_TO_TOPOLOGY_MAP = {
 	{0x000001ffc0009e00, 0}, {0x000003ffc0009e00, 1}, {0x000005ffc0009e00, 2}, {0x000007ffc0009e00, 3},
 	{0x000009ffc0009e00, 4}, {0x00000dffc0009e00, 5}, {0x00000bffc0009e00, 6}, {0x000001ffc0009e00, 7},
