@@ -13,6 +13,7 @@
 winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::CreateContainer(winrt::hstring name) const
 {
    // printf("[ConnectedStorage] Container %S requested creation\n", name.c_str());
+    printf("%s called\n", __FUNCTION__);
 
     if (!co_await DoesFolderExist(m_storagePath + L"\\" + name))
     {
@@ -26,6 +27,7 @@ winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::Cre
 winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::Read(
     winrt::hstring containerName, winrt::Windows::Foundation::Collections::IMapView<winrt::hstring, winrt::Windows::Storage::Streams::IBuffer> data) const
 {
+    printf("%s called\n", __FUNCTION__);
     if (!co_await DoesFolderExist(m_storagePath + L"\\" + containerName)) {
         co_await CreateContainer(containerName);
         printf("[ConnectedStorage] Container %S created\n", containerName.c_str( ));
@@ -56,6 +58,7 @@ winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::Upl
     winrt::Windows::Foundation::Collections::IIterable<winrt::hstring> blobsToDelete,
     winrt::hstring displayName) const
 {
+    printf("%s called\n", __FUNCTION__);
     if (!co_await DoesFolderExist(m_storagePath + L"\\" + containerName)) {
         co_await CreateContainer(containerName);
         printf("[ConnectedStorage] Container %S created\n", containerName.c_str( ));
@@ -92,6 +95,7 @@ winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collecti
 Storage::BlobInfo>> WinDurango::impl::ConnectedStorage::GetBlobInfoAsync(winrt::hstring parentContainerName,
 	winrt::hstring blobNamePrefix)
 {
+    printf("%s called\n", __FUNCTION__);
     winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Xbox::Storage::BlobInfo> blobInfoVector = winrt::single_threaded_vector<winrt::Windows::Xbox::Storage::BlobInfo>( );
     winrt::hstring s_prefix = blobNamePrefix;
 
@@ -147,23 +151,16 @@ Storage::ContainerInfo2>> WinDurango::impl::ConnectedStorage::GetContainerInfo2A
     co_return containerInfoVector.GetView( );
 }
 
-winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::DeleteContainer(winrt::hstring containerName)
-{
-    winrt::hstring containerPath = m_storagePath + L"\\" + containerName;
-    if (co_await DoesFolderExist(containerPath)) {
-        auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(containerPath);
-        co_await folder.DeleteAsync( );
-    }
-}
-
 winrt::hstring WinDurango::impl::ConnectedStorage::ObtainPackageName()
 {
+    printf("%s called\n", __FUNCTION__);
     return winrt::Windows::ApplicationModel::Package::Current( ).Id( ).FamilyName( );
 }
 
 winrt::Windows::Foundation::IAsyncOperation<bool> WinDurango::impl::ConnectedStorage::DoesFolderExist(
 	winrt::hstring path)
 {
+    printf("%s called\n", __FUNCTION__);
     try
     {
         co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(path);
@@ -179,6 +176,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> WinDurango::impl::ConnectedSto
 winrt::Windows::Foundation::IAsyncOperation<bool> WinDurango::impl::ConnectedStorage::DoesFileExist(
 	winrt::Windows::Storage::StorageFolder folder, winrt::hstring path)
 {
+    printf("%s called\n", __FUNCTION__);
 	try
 	{
 		co_await folder.GetFileAsync(path);
@@ -193,6 +191,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> WinDurango::impl::ConnectedSto
 
 winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::CreateDirectories(const wchar_t* storageType, winrt::hstring& storagePath)
 {
+    printf("%s called\n", __FUNCTION__);
     co_await winrt::resume_background( );
 
     winrt::hstring packageName = ObtainPackageName( );
@@ -220,6 +219,7 @@ winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::Cre
 
 winrt::Windows::Foundation::IAsyncAction WinDurango::impl::ConnectedStorage::InitializeStorage(const wchar_t* name)
 {
+    printf("%s called\n", __FUNCTION__);
 	co_await CreateDirectories(name, m_storagePath);
 
     printf("[ConnectedStorage] User storage initialized at %S\n", m_storagePath.c_str());

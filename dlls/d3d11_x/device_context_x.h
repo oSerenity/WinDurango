@@ -1,9 +1,18 @@
 #pragma once
 #include <array>
 #include <map>
-
+#include <initguid.h>  // Required to define GUIDs
 #include "device_child_x.h"
 #include "device_x.h"
+
+extern const IID IID_ID3D11DeviceContextX;
+extern const IID IID_ID3D11DeviceX;
+
+DEFINE_GUID(IID_ID3D11DeviceX,
+	0x177700F9, 0x876A, 0x4436, 0xB3, 0x68, 0x36, 0xA6, 0x04, 0xF8, 0x2C, 0xEF);
+
+DEFINE_GUID(IID_ID3D11DeviceContextX,
+	0x48800095, 0x7134, 0x4BE7, 0x91, 0x86, 0xB8, 0x6B, 0xEC, 0xB2, 0x64, 0x77);
 
 static std::map<UINT64, int> D3D11X_HARDWARE_TO_TOPOLOGY_MAP = {
 	{0x000001ffc0009e00, 0}, {0x000003ffc0009e00, 1}, {0x000005ffc0009e00, 2}, {0x000007ffc0009e00, 3},

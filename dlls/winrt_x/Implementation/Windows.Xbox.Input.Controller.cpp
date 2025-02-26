@@ -60,11 +60,12 @@ namespace winrt::Windows::Xbox::Input::implementation
     winrt::event_token Controller::ControllerOrderChanged(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::ControllerOrderChangedEventArgs> const& handler)
     {
         printf("[ControllerOrderChanged] STUBBED\n");
-        return {};
+        throw hresult_not_implemented( );
     }
     void Controller::ControllerOrderChanged(winrt::event_token const& token) noexcept
     {
-        printf("[ControllerOrderChangedInternal] STUBBED\n");
+        printf("[ControllerOrderChanged] STUBBED\n");
+        throw hresult_not_implemented( );
     }
     winrt::Windows::Xbox::Input::IController Controller::GetControllerById(uint64_t controllerId)
     {
