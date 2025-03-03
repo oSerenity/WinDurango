@@ -8,6 +8,8 @@ namespace winrt::Microsoft::Xbox::Services::Social::implementation
     {
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
+
+		return m_state;
     }
 
     hstring SocialRelationshipChangeSubscription::ResourceUri()

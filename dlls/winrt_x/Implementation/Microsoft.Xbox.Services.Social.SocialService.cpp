@@ -17,7 +17,9 @@ namespace winrt::Microsoft::Xbox::Services::Social::implementation
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
 
-		m_socialRelationshipChanged(__param0);
+		// m_socialRelationshipChanged.add(__param0);
+
+        throw hresult_not_implemented();
     }
 
     Windows::Foundation::IAsyncOperation<XboxSocialRelationshipResult> SocialService::GetSocialRelationshipsAsync()
