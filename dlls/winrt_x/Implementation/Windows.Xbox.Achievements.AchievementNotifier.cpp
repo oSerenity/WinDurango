@@ -5,12 +5,19 @@
 
 namespace winrt::Windows::Xbox::Achievements::implementation
 {
-    winrt::Windows::Xbox::Achievements::AchievementSource AchievementNotifier::GetTitleIdFilteredSource()
+    Achievements::AchievementSource AchievementNotifier::GetTitleIdFilteredSource()
     {
-        return winrt::make<winrt::Windows::Xbox::Achievements::implementation::AchievementSource>();
+        LOG_FUNCTION_NAME();
+        PRINT_UNIMPLEMENTED_FUNCTION();
+
+        return winrt::make<AchievementSource>();
     }
-    winrt::Windows::Xbox::Achievements::AchievementSource AchievementNotifier::GetUnfilteredSource()
+
+    Achievements::AchievementSource AchievementNotifier::GetUnfilteredSource()
     {
-        return winrt::make<winrt::Windows::Xbox::Achievements::implementation::AchievementSource>();
+        LOG_FUNCTION_NAME();
+        PRINT_UNIMPLEMENTED_FUNCTION();
+
+        return winrt::make<AchievementSource>();
     }
 }
