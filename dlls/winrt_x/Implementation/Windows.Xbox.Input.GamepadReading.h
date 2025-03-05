@@ -1,3 +1,4 @@
+// ReSharper disable CppPassValueParameterByConstReference
 #pragma once
 #include "Windows.Xbox.Input.GamepadReading.g.h"
 
@@ -5,12 +6,11 @@ namespace winrt::Windows::Xbox::Input::implementation
 {
     struct GamepadReading : GamepadReadingT<GamepadReading>
     {
-        RawGamepadReading m_Reading;
         GamepadReading(RawGamepadReading reading) : m_Reading(reading) {}
         GamepadReading() = default;
 
-        winrt::Windows::Foundation::DateTime Timestamp();
-        winrt::Windows::Xbox::Input::GamepadButtons Buttons();
+        Foundation::DateTime Timestamp();
+        GamepadButtons Buttons();
         bool IsDPadUpPressed();
         bool IsDPadDownPressed();
         bool IsDPadLeftPressed();
@@ -35,5 +35,9 @@ namespace winrt::Windows::Xbox::Input::implementation
         bool IsPaddle2Pressed();
         bool IsPaddle3Pressed();
         bool IsPaddle4Pressed();
+
+    private:
+        RawGamepadReading m_Reading{};
+		Foundation::DateTime m_Timestamp = Foundation::DateTime::clock::now();
     };
 }

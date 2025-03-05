@@ -9,12 +9,12 @@
 
 namespace winrt::Windows::Xbox::Input::implementation
 {
-    winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Input::IGamepad> Gamepad::Gamepads()
+    Foundation::Collections::IVectorView<IGamepad> Gamepad::Gamepads()
     {
         wprintf(L"Gamepad || Gamepads Queried!\n");
 
-        if (staticGamepads == Foundation::Collections::IVector<winrt::Windows::Xbox::Input::IGamepad>(nullptr) || staticGamepads.Size( ) == 0) {
-            staticGamepads = winrt::single_threaded_vector<Input::IGamepad>( );
+        if (staticGamepads == Foundation::Collections::IVector<IGamepad>(nullptr) || staticGamepads.Size( ) == 0) {
+            staticGamepads = winrt::single_threaded_vector<IGamepad>( );
             
             for (DWORD gamepad = 0; gamepad < XUSER_MAX_COUNT; gamepad++)
             {
@@ -37,22 +37,22 @@ namespace winrt::Windows::Xbox::Input::implementation
 
         return staticGamepads.GetView( );
     }
-    winrt::event_token Gamepad::GamepadAdded(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::GamepadAddedEventArgs> const& handler)
+    event_token Gamepad::GamepadAdded(Foundation::EventHandler<GamepadAddedEventArgs> const& handler)
     {
 		wprintf(L"Gamepad || Gamepad Added!\n");
         return {};
     }
-    void Gamepad::GamepadAdded(winrt::event_token const& token) noexcept
+    void Gamepad::GamepadAdded(event_token const& token) noexcept
     {
         wprintf(L"Gamepad || Gamepad Added!\n");
         throw hresult_not_implemented();
     }
-    winrt::event_token Gamepad::GamepadRemoved(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::GamepadRemovedEventArgs> const& handler)
+    event_token Gamepad::GamepadRemoved(Foundation::EventHandler<GamepadRemovedEventArgs> const& handler)
     {
 		wprintf(L"Gamepad || Gamepad Removed!\n");
         return {};
     }
-    void Gamepad::GamepadRemoved(winrt::event_token const& token) noexcept
+    void Gamepad::GamepadRemoved(event_token const& token) noexcept
     {
         wprintf(L"Gamepad || Gamepad Removed!\n");
         throw hresult_not_implemented();
@@ -66,31 +66,31 @@ namespace winrt::Windows::Xbox::Input::implementation
     {
         return L"Windows.Xbox.Input.Gamepad";
     }
-    winrt::Windows::Xbox::System::User Gamepad::User()
+    System::User Gamepad::User()
     {
 		wprintf(L"Gamepad || User Queried!\n");
 		return System::implementation::User::Users( ).GetAt(Id());
     }
-    winrt::Windows::Xbox::Input::INavigationReading Gamepad::GetNavigationReading()
+    INavigationReading Gamepad::GetNavigationReading()
     {
         throw hresult_not_implemented();
     }
-    winrt::Windows::Xbox::Input::RawNavigationReading Gamepad::GetRawNavigationReading()
+    RawNavigationReading Gamepad::GetRawNavigationReading()
     {
         RawNavigationReading dummyNavigationReading = RawNavigationReading( );
         dummyNavigationReading.Timestamp = GetTickCount64( );
 		dummyNavigationReading.Buttons |= NavigationButtons::Up;
 		return dummyNavigationReading;
     }
-    winrt::event_token Gamepad::NavigationReadingChanged(winrt::Windows::Foundation::TypedEventHandler<winrt::Windows::Xbox::Input::NavigationController, winrt::Windows::Xbox::Input::INavigationReadingChangedEventArgs> const& handler)
+    event_token Gamepad::NavigationReadingChanged(Foundation::TypedEventHandler<NavigationController, INavigationReadingChangedEventArgs> const& handler)
     {
         throw hresult_not_implemented();
     }
-    void Gamepad::NavigationReadingChanged(winrt::event_token const& token) noexcept
+    void Gamepad::NavigationReadingChanged(event_token const& token) noexcept
     {
         throw hresult_not_implemented();
     }
-    void Gamepad::SetVibration(winrt::Windows::Xbox::Input::GamepadVibration const& value)
+    void Gamepad::SetVibration(GamepadVibration const& value)
     {
         XINPUT_VIBRATION vibration;
         ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
@@ -98,11 +98,11 @@ namespace winrt::Windows::Xbox::Input::implementation
         vibration.wRightMotorSpeed = value.RightMotorLevel * 65535;
         XInputSetState(m_id, &vibration);
     }
-    winrt::Windows::Xbox::Input::IGamepadReading Gamepad::GetCurrentReading()
+    IGamepadReading Gamepad::GetCurrentReading()
     {
-        return winrt::make<implementation::GamepadReading>(GetRawCurrentReading());
+        return winrt::make<GamepadReading>(GetRawCurrentReading());
     }
-    winrt::Windows::Xbox::Input::RawGamepadReading Gamepad::GetRawCurrentReading()
+    RawGamepadReading Gamepad::GetRawCurrentReading()
     {
         XINPUT_STATE xiState;
 		ZeroMemory(&xiState, sizeof(XINPUT_STATE));
@@ -136,11 +136,11 @@ namespace winrt::Windows::Xbox::Input::implementation
 
         return reading;
     }
-    winrt::event_token Gamepad::ReadingChanged(winrt::Windows::Foundation::TypedEventHandler<winrt::Windows::Xbox::Input::Gamepad, winrt::Windows::Xbox::Input::IGamepadReadingChangedEventArgs> const& handler)
+    event_token Gamepad::ReadingChanged(Foundation::TypedEventHandler<Input::Gamepad, IGamepadReadingChangedEventArgs> const& handler)
     {
         throw hresult_not_implemented();
     }
-    void Gamepad::ReadingChanged(winrt::event_token const& token) noexcept
+    void Gamepad::ReadingChanged(event_token const& token) noexcept
     {
         throw hresult_not_implemented();
     }

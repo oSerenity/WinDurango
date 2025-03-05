@@ -38,7 +38,7 @@ namespace winrt::Microsoft::Xbox::GameChat::implementation
 		LOG_FUNCTION_NAME();
 		PRINT_UNIMPLEMENTED_FUNCTION();
 
-		throw hresult_not_implemented();
+		return winrt::make<ChatManagerSettings>();
 	}
 
 	event_token ChatManager::OnDebugMessage(Windows::Foundation::EventHandler<DebugMessageEventArgs> const& __param0)
@@ -53,8 +53,6 @@ namespace winrt::Microsoft::Xbox::GameChat::implementation
 	{
 		LOG_FUNCTION_NAME();
 		PRINT_UNIMPLEMENTED_FUNCTION();
-
-		throw hresult_not_implemented();
 	}
 
 	event_token ChatManager::OnOutgoingChatPacketReady(Windows::Foundation::EventHandler<ChatPacketEventArgs> const& __param0)
