@@ -4,10 +4,8 @@
 
 namespace winrt::Windows::Xbox::Media::implementation
 {
-	winrt::Windows::Xbox::Media::GameTransportControlsProperty GameTransportControlsPropertyChangedEventArgs::Property()
+	GameTransportControlsProperty GameTransportControlsPropertyChangedEventArgs::Property()
 	{
-		GameTransportControlsProperty prop{};
-
-		return prop;
+		return m_property;
 	}
 }

@@ -7,6 +7,9 @@ namespace winrt::Windows::Xbox::Media::implementation
 	{
 		GameTransportControlsPropertyChangedEventArgs() = default;
 
-		winrt::Windows::Xbox::Media::GameTransportControlsProperty Property();
+		GameTransportControlsProperty Property();
+
+	private:
+		GameTransportControlsProperty m_property = GameTransportControlsProperty::SoundLevel;
 	};
 }
