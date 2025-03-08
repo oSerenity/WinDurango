@@ -42,9 +42,9 @@ namespace winrt::Windows::Xbox::System::implementation
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
 
-		// TODO: I think this might break something, but I'm not sure.
+		// TODO: I hate this because this should a be class member, but I'm not sure how to do that.
 
-        return m_users;
+        return single_threaded_vector<System::User>({ make<User>(0), make<User>(1), make<User>(2), make<User>(3) }).GetView();
     }
 
     event_token User::UserAdded(Foundation::EventHandler<UserAddedEventArgs> const& handler)
