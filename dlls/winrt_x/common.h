@@ -25,3 +25,10 @@
 #define SERVER_MEASUREMENTS_JSON                MAKE_HSTRING("{}")
 #define DEVICE_ID                               MAKE_HSTRING("device01234567890")
 #define ACTIVE_TITLE_ID                         69420  // NOLINT(modernize-macro-to-enum)
+
+enum
+{
+    EQUAL = 0,
+    GREATER_THAN = 1,
+    LESS_THAN = -1
+};
