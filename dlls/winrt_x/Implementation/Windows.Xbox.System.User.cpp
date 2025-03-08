@@ -1,5 +1,3 @@
-// ReSharper disable CppClangTidyPerformanceUnnecessaryValueParam
-// ReSharper disable CppParameterNeverUsed
 #include "pch.h"
 #include "Windows.Xbox.System.User.h"
 #include "Windows.Xbox.System.User.g.cpp"
@@ -7,333 +5,200 @@
 
 namespace winrt::Windows::Xbox::System::implementation
 {
-	User::User(uint64_t id) : m_id(id)
-	{
-		LOG_FUNCTION_NAME();
-		PRINT_UNIMPLEMENTED_FUNCTION();
-	}
-
+    //winrt::event<winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::UserAddedEventArgs>> m_userAddedEvent;
     UserOnlineState User::OnlineState()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_onlineState;
+        return UserOnlineState::Offline;
     }
-
-    event_token User::OnlineStateChanged(Foundation::EventHandler<OnlineStateChangedEventArgs> const& handler)
+    winrt::event_token User::OnlineStateChanged(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::OnlineStateChangedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         return m_onlineStateChangedEvent.add(handler);
     }
-
-    void User::OnlineStateChanged(event_token const& token) noexcept
+    void User::OnlineStateChanged(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         m_onlineStateChangedEvent.remove(token);
     }
-
-    Foundation::Collections::IVectorView<System::User> User::Users()
+    winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::System::User> User::Users()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
+		wprintf(L"User || Users Queried!\n");
+        if (staticUsers == Foundation::Collections::IVector<winrt::Windows::Xbox::System::User>(nullptr) || staticUsers.Size( ) == 0) {
+            staticUsers = winrt::single_threaded_vector<System::User>( );
 
-		// TODO: I hate this because this should a be class member, but I'm not sure how to do that.
+            for (int i = 0; i < 4; i++)
+            {
+                wprintf(L"User || User %d Created!\n", i);
+                staticUser = winrt::make<User>(i);
+                staticUsers.Append(staticUser);
+                continue;
+            }
+        }
 
-        return single_threaded_vector<System::User>({ make<User>(0), make<User>(1), make<User>(2), make<User>(3) }).GetView();
+        return staticUsers.GetView();
     }
-
-    event_token User::UserAdded(Foundation::EventHandler<UserAddedEventArgs> const& handler)
+    winrt::event_token User::UserAdded(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::UserAddedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         return m_userAddedEvent.add(handler);
     }
-
-    void User::UserAdded(event_token const& token) noexcept
+    void User::UserAdded(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         m_userAddedEvent.remove(token);
     }
-
-    event_token User::UserRemoved(Foundation::EventHandler<UserRemovedEventArgs> const& handler)
+    winrt::event_token User::UserRemoved(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::UserRemovedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         return m_userRemovedEvent.add(handler);
     }
-
-    void User::UserRemoved(event_token const& token) noexcept
+    void User::UserRemoved(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         m_userRemovedEvent.remove(token);
     }
-
-    System::User User::GetUserById(uint32_t id)
+    winrt::Windows::Xbox::System::User User::GetUserById(uint32_t id)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_users.GetAt(id);
-    }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers)
-    {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User GetUserById | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers, array_view<uint8_t const> body)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureForAllUsersAsync | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers, hstring body)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers, array_view<uint8_t const> body)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureForAllUsersAsync | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
-    event_token User::AudioDeviceAdded(Foundation::EventHandler<AudioDeviceAddedEventArgs> const& handler)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureForAllUsersAsync(hstring httpMethod, hstring url, hstring headers, hstring body)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_audioDeviceAddedEvent.add(handler);
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureForAllUsersAsync | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
     }
-
-    void User::AudioDeviceAdded(event_token const& token) noexcept
+    winrt::event_token User::AudioDeviceAdded(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::AudioDeviceAddedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_audioDeviceAddedEvent.remove(token);
+        return {};
     }
-
-    event_token User::AudioDeviceRemoved(Foundation::EventHandler<AudioDeviceRemovedEventArgs> const& handler)
+    void User::AudioDeviceAdded(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_audioDeviceRemovedEvent.add(handler);
+        return;
     }
-
-    void User::AudioDeviceRemoved(event_token const& token) noexcept
+    winrt::event_token User::AudioDeviceRemoved(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::AudioDeviceRemovedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_audioDeviceRemovedEvent.remove(token);
+        printf("!!!! Windows.Xbox.System.User AudioDeviceRemoved | NOT IMPLEMENTED !!!!\n");
+        return {};
     }
-
-    event_token User::AudioDeviceChanged(Foundation::EventHandler<AudioDeviceChangedEventArgs> const& handler)
+    void User::AudioDeviceRemoved(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_audioDeviceChangedEvent.add(handler);
+        printf("!!!! Windows.Xbox.System.User AudioDeviceRemoved | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
     }
-
-    void User::AudioDeviceChanged(event_token const& token) noexcept
+    winrt::event_token User::AudioDeviceChanged(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::AudioDeviceChangedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_audioDeviceChangedEvent.remove(token);
+        printf("!!!! Windows.Xbox.System.User AudioDeviceChanged | NOT IMPLEMENTED !!!!\n");
+        return {};
     }
-
-    event_token User::SignInCompleted(Foundation::EventHandler<SignInCompletedEventArgs> const& handler)
+    void User::AudioDeviceChanged(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_signInCompletedEvent.add(handler);
+        printf("!!!! Windows.Xbox.System.User AudioDeviceChanged | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
     }
-
-    void User::SignInCompleted(event_token const& token) noexcept
+    winrt::event_token User::SignInCompleted(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::SignInCompletedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_signInCompletedEvent.remove(token);
+        return {};
     }
-
-    event_token User::SignOutStarted(Foundation::EventHandler<SignOutStartedEventArgs> const& handler)
+    void User::SignInCompleted(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User SignInCompleted | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
+    }
+    winrt::event_token User::SignOutStarted(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::SignOutStartedEventArgs> const& handler)
+    {
         return m_signOutStartedEvent.add(handler);
     }
-
-    void User::SignOutStarted(event_token const& token) noexcept
+    void User::SignOutStarted(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         m_signOutStartedEvent.remove(token);
     }
-
-    event_token User::SignOutCompleted(Foundation::EventHandler<SignOutCompletedEventArgs> const& handler)
+    winrt::event_token User::SignOutCompleted(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::SignOutCompletedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_signOutCompletedEvent.add(handler);
+        return {};
     }
-
-    void User::SignOutCompleted(event_token const& token) noexcept
+    void User::SignOutCompleted(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_signOutCompletedEvent.remove(token);
+        return;
     }
-
-    event_token User::UserDisplayInfoChanged(Foundation::EventHandler<UserDisplayInfoChangedEventArgs> const& handler)
+    winrt::event_token User::UserDisplayInfoChanged(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::System::UserDisplayInfoChangedEventArgs> const& handler)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_userDisplayInfoChangedEvent.add(handler);
+        printf("!!!! Windows.Xbox.System.User UserDisplayInfoChanged | NOT IMPLEMENTED !!!!\n");
+        return {};
     }
-
-    void User::UserDisplayInfoChanged(event_token const& token) noexcept
+    void User::UserDisplayInfoChanged(winrt::event_token const& token) noexcept
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		m_userDisplayInfoChangedEvent.remove(token);
-    }
-
-    guid User::GetNetworkCacheIdForUsers(Foundation::Collections::IVectorView<uint32_t> const& users)
-    {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User UserDisplayInfoChanged | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
+    winrt::guid User::GetNetworkCacheIdForUsers(winrt::Windows::Foundation::Collections::IVectorView<uint32_t> const& users)
+    {
+        printf("!!!! Windows.Xbox.System.User GetNetworkCacheIdForUsers | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
+    }
     uint32_t User::Id()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         return m_id;
     }
-
-    Foundation::Collections::IVectorView<IAudioDeviceInfo> User::AudioDevices()
+    winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::System::IAudioDeviceInfo> User::AudioDevices()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_audioDevices;
+        printf("!!!! Windows.Xbox.System.User AudioDevices | NOT IMPLEMENTED !!!!\n");
+        return winrt::single_threaded_vector<System::IAudioDeviceInfo>( ).GetView( );
     }
-
-    Foundation::Collections::IVectorView<Input::IController> User::Controllers()
+    winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Input::IController> User::Controllers()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_controllers;
+        printf("!!!! Windows.Xbox.System.User Controllers | NOT IMPLEMENTED !!!!\n");
+        return winrt::single_threaded_vector<Input::IController>( ).GetView( );
     }
-
-    System::UserDisplayInfo User::DisplayInfo()
+    winrt::Windows::Xbox::System::UserDisplayInfo User::DisplayInfo()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
         hstring gamertag = to_hstring(m_id);
-
-        return winrt::make<UserDisplayInfo>(gamertag);
+        return winrt::make<implementation::UserDisplayInfo>(gamertag);
     }
-
     bool User::IsGuest()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_guest;
+        return false;
     }
-
     bool User::IsSignedIn()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_signedIn;
+        return true;
     }
-
-    UserLocation User::Location()
+    winrt::Windows::Xbox::System::UserLocation User::Location()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_location;
+        printf("!!!! Windows.Xbox.System.User Location | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
     }
-
-    System::User User::Sponsor()
+    winrt::Windows::Xbox::System::User User::Sponsor()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_sponsor;
+        printf("!!!! Windows.Xbox.System.User Sponsor | NOT IMPLEMENTED !!!!\n");
+        return nullptr;
     }
-
     hstring User::XboxUserHash()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		return m_xboxUserHash;
+        printf("!!!! Windows.Xbox.System.User XboxUserHash | NOT IMPLEMENTED-- !!!!\n");
+        return winrt::to_hstring(m_id);
     }
-
     hstring User::XboxUserId()
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-        return m_xboxUserId;
+        printf("!!!! Windows.Xbox.System.User XboxUserId | NOT IMPLEMENTED !!!!\n");
+        return winrt::to_hstring(m_id);
     }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureAsync | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers, array_view<uint8_t const> body)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers, array_view<uint8_t const> body)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureAsync | NOT IMPLEMENTED !!!!\n");
         throw hresult_not_implemented();
     }
-
-    Foundation::IAsyncOperation<GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers, hstring body)
+    winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Xbox::System::GetTokenAndSignatureResult> User::GetTokenAndSignatureAsync(hstring httpMethod, hstring url, hstring headers, hstring body)
     {
-        LOG_FUNCTION_NAME();
-        PRINT_UNIMPLEMENTED_FUNCTION();
-
-		throw hresult_not_implemented();
+        printf("!!!! Windows.Xbox.System.User GetTokenAndSignatureAsync | NOT IMPLEMENTED !!!!\n");
+        throw hresult_not_implemented();
     }
 }
