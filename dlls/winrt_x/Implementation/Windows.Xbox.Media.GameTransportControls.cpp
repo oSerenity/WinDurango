@@ -160,9 +160,9 @@ namespace winrt::Windows::Xbox::Media::implementation
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
 
-        //return m_gameTransportControlsPropertyChangedEventArgs.add(handler);
+        return m_gameTransportControlsPropertyChangedEventArgs.add(handler);
 
-		throw hresult_not_implemented();
+		//throw hresult_not_implemented();
     }
 
     void GameTransportControls::PropertyChanged(winrt::event_token const& token) noexcept
@@ -170,8 +170,8 @@ namespace winrt::Windows::Xbox::Media::implementation
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
 
-        //m_gameTransportControlsPropertyChangedEventArgs.remove(token);
+        m_gameTransportControlsPropertyChangedEventArgs.remove(token);
 
-        throw hresult_not_implemented();
+        //throw hresult_not_implemented();
     }
 }

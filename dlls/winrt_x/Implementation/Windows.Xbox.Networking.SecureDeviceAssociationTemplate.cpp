@@ -9,7 +9,7 @@ namespace winrt::Windows::Xbox::Networking::implementation
 		LOG_FUNCTION_NAME();
 		PRINT_UNIMPLEMENTED_FUNCTION();
 
-        throw hresult_not_implemented();
+        return nullptr;
     }
 
     Foundation::Collections::IVectorView<Networking::SecureDeviceAssociationTemplate> SecureDeviceAssociationTemplate::Templates()

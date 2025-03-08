@@ -260,15 +260,15 @@ namespace winrt::Windows::Xbox::System::implementation
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
 
-        return m_displayInfo;
+        hstring gamertag = to_hstring(m_id);
+
+        return winrt::make<UserDisplayInfo>(gamertag);
     }
 
     bool User::IsGuest()
     {
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
-
-        throw hresult_not_implemented();
 
         return m_guest;
     }
@@ -277,8 +277,6 @@ namespace winrt::Windows::Xbox::System::implementation
     {
         LOG_FUNCTION_NAME();
         PRINT_UNIMPLEMENTED_FUNCTION();
-
-        throw hresult_not_implemented();
 
         return m_signedIn;
     }

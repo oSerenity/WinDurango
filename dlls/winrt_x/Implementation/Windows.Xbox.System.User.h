@@ -66,7 +66,7 @@ namespace winrt::Windows::Xbox::System::implementation
 		static inline Foundation::Collections::IVectorView<Input::IController> m_controllers{ EMPTY_IVECTOR(Input::IController).GetView() };
 		static inline UserDisplayInfo m_displayInfo{ nullptr };
         static inline bool m_guest{ false };
-		static inline bool m_signedIn{ false };
+		static inline bool m_signedIn{ true };
 		static inline auto m_location{ UserLocation::Local };
 		static inline System::User m_sponsor{ nullptr };
         static inline hstring m_xboxUserHash{ L"XboxUserHash" };
