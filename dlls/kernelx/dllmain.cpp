@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include "Shlwapi.h"
 
+bool modFolder = true;
+
 // note from unixian: i used this since using appxlauncher requires me attaching to the game after it launches
 #define WINDURANGO_WAIT_FOR_DEBUGGER 1
 
@@ -159,7 +161,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 		DetourTransactionCommit();
 
 
-		LoadMods();
+		if (modFolder) { LoadMods(); }
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
