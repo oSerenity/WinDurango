@@ -1,7 +1,0 @@
-LIBRARY MMDevAPI
-EXPORTS
-	RestoreBitstreamOut = RestoreBitstreamOut_X
-	DisableBitstreamOut = DisableBitstreamOut_X
-	EnableSpatialAudio = EnableSpatialAudio_X
-	SetWasapiThreadAffinityMask = SetWasapiThreadAffinityMask_X
-	RefreshWasapiDeviceList = RefreshWasapiDeviceList_X

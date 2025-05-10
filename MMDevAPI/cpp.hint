@@ -1,0 +1,2 @@
+#define MMDEVAPI_API __declspec(dllexport)
+#define MMDEVAPI_API __declspec(dllimport)
