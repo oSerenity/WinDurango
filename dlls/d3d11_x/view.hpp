@@ -1,5 +1,4 @@
 #pragma once
-#include <emmintrin.h>
 #include "device_child_x.h"
 #include "resource.hpp"
 
@@ -80,7 +79,7 @@ namespace wd
         render_target_view(::ID3D11RenderTargetView* view) : wrapped_interface(view)
         {
             m_pResource = reinterpret_cast<wdi::ID3D11Resource*>(wrapped_interface);
-        	wrapped_interface->AddRef( );
+        	wrapped_interface->AddRef();
         }
         IGU_DEFINE_REF
 
@@ -89,7 +88,7 @@ namespace wd
             if (riid == __uuidof(wdi::ID3D11RenderTargetView))
             {
                 *ppvObject = this;
-                AddRef( );
+                AddRef();
                 return S_OK;
             }
             TRACE_INTERFACE_NOT_HANDLED("render_target_view");
@@ -155,7 +154,7 @@ namespace wd
         depth_stencil_view(::ID3D11DepthStencilView* view) : wrapped_interface(view)
         {
             m_pResource = reinterpret_cast<wdi::ID3D11Resource*>(wrapped_interface);
-            wrapped_interface->AddRef( );
+            wrapped_interface->AddRef();
         }
         IGU_DEFINE_REF
 
@@ -164,7 +163,7 @@ namespace wd
             if (riid == __uuidof(wdi::ID3D11DepthStencilView))
             {
                 *ppvObject = this;
-                AddRef( );
+                AddRef();
                 return S_OK;
             }
             TRACE_INTERFACE_NOT_HANDLED("depth_stencil_view");
@@ -230,7 +229,7 @@ namespace wd
         shader_resource_view(::ID3D11ShaderResourceView* view) : wrapped_interface(view)
         {
             m_pResource = reinterpret_cast<wdi::ID3D11Resource*>(wrapped_interface);
-            wrapped_interface->AddRef( );
+            wrapped_interface->AddRef();
         }
         IGU_DEFINE_REF
 
@@ -239,7 +238,7 @@ namespace wd
             if (riid == __uuidof(wdi::ID3D11ShaderResourceView))
             {
                 *ppvObject = this;
-                AddRef( );
+                AddRef();
                 return S_OK;
             }
             TRACE_INTERFACE_NOT_HANDLED("shader_resource_view");
@@ -305,7 +304,7 @@ namespace wd
         unordered_access_view(::ID3D11UnorderedAccessView* view) : wrapped_interface(view)
         {
             m_pResource = reinterpret_cast<wdi::ID3D11Resource*>(wrapped_interface);
-            wrapped_interface->AddRef( );
+            wrapped_interface->AddRef();
         }
 
         IGU_DEFINE_REF
@@ -315,7 +314,7 @@ namespace wd
             if (riid == __uuidof(wdi::ID3D11UnorderedAccessView))
             {
                 *ppvObject = this;
-                AddRef( );
+                AddRef();
                 return S_OK;
             }
             TRACE_INTERFACE_NOT_HANDLED("shader_resource_view");

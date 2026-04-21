@@ -1,26 +1,6 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
-#include "EtwPlus.h"
 #include "pch.h"
-#include <stdio.h>
-#include "../common/Logger.h"
-#include <evntrace.h>
+
+#include "EtwPlus.h"
 
 #pragma comment(lib, "advapi32.lib")
 std::atomic_bool g_EtxUploadPaused{ false };
@@ -57,9 +37,9 @@ VOID __stdcall EtxFillCommonFields_v7_X(
     LARGE_INTEGER qpc;
     QueryPerformanceCounter(&qpc);
     fields->Timestamp = static_cast<ULONGLONG>(qpc.QuadPart);
-    fields->ProcessId = GetCurrentProcessId( );
-    fields->ThreadId = GetCurrentThreadId( );
-    fields->CpuId = GetCurrentProcessorNumber( );
+    fields->ProcessId = GetCurrentProcessId();
+    fields->ThreadId = GetCurrentThreadId();
+    fields->CpuId = GetCurrentProcessorNumber();
     fields->Reserved = 0;
 
     // Point the first descriptor at the filled-in buffer.
@@ -113,7 +93,7 @@ ULONG __stdcall EtxEventWrite_X(
         const_cast<PEVENT_DATA_DESCRIPTOR>(eventData));
 }
 
-void __stdcall EtxSuspendUploading_X( )
+void __stdcall EtxSuspendUploading_X()
 {
     g_EtxUploadPaused.store(true, std::memory_order_release);
 
@@ -121,7 +101,7 @@ void __stdcall EtxSuspendUploading_X( )
         ResetEvent(g_EtxUploaderResumeEvent);
 }
 
-void __stdcall EtxResumeUploading_X( )
+void __stdcall EtxResumeUploading_X()
 {
     // Clear the pause flag
     g_EtxUploadPaused.store(false, std::memory_order_release);

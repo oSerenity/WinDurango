@@ -1,36 +1,59 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
 #pragma once
-#include <cstdio>
+#include <common.h>
+
 #include <d3d11_1.h>
 #include <d3d11_2.h>
-#include "graphics_unknown.h"
-#include <exception>
-#include <format>
+#include <d3d11.h>
+#include "d3d11_x.h"
 #include "dxgi_device.h"
+#include "graphics_unknown.h"
+#include "flags.h"
+
+#define D3D11X_RESOURCE_MISC_FORCE_TEXTURE_COMPATIBILITY D3D11_RESOURCE_MISC_FLAG(1 << 15)
+#define D3D11X_RESOURCE_MISC_ESRAM_RESIDENT              D3D11_RESOURCE_MISC_FLAG(1 << 17)
+#define D3D11X_RESOURCE_MISC_NO_COLOR_EXPAND             D3D11_RESOURCE_MISC_FLAG(1 << 18)
+#define D3D11X_RESOURCE_MISC_NO_COLOR_COMPRESSION        D3D11_RESOURCE_MISC_FLAG(1 << 19)
+#define D3D11X_RESOURCE_MISC_NO_DEPTH_COMPRESSION        D3D11_RESOURCE_MISC_FLAG(1 << 20)
+#define D3D11X_RESOURCE_MISC_NO_STENCIL_COMPRESSION      D3D11_RESOURCE_MISC_FLAG(1 << 21)
+#define D3D11X_RESOURCE_MISC_ALLOW_DCC                   D3D11_RESOURCE_MISC_FLAG(1 << 22)
+#define D3D11X_RESOURCE_MISC_TILE_POOL                   D3D11_RESOURCE_MISC_FLAG(1 << 26) // conflict
+#define D3D11X_RESOURCE_MISC_TILED                       D3D11_RESOURCE_MISC_FLAG(1 << 27) // conflict
+
+#define D3D11X_RESOURCE_MISC_MASK                    ( \
+    D3D11X_RESOURCE_MISC_FORCE_TEXTURE_COMPATIBILITY | \
+    D3D11X_RESOURCE_MISC_ESRAM_RESIDENT              | \
+    D3D11X_RESOURCE_MISC_NO_COLOR_EXPAND             | \
+    D3D11X_RESOURCE_MISC_NO_COLOR_COMPRESSION        | \
+    D3D11X_RESOURCE_MISC_NO_DEPTH_COMPRESSION        | \
+    D3D11X_RESOURCE_MISC_NO_STENCIL_COMPRESSION      | \
+    D3D11X_RESOURCE_MISC_ALLOW_DCC                   | \
+    D3D11X_RESOURCE_MISC_TILE_POOL                   | \
+    D3D11X_RESOURCE_MISC_TILED                       )
+
+#define D3D11_RESOURCE_MISC_MASK                        ( \
+    D3D11_RESOURCE_MISC_GENERATE_MIPS                   | \
+    D3D11_RESOURCE_MISC_SHARED                          | \
+    D3D11_RESOURCE_MISC_TEXTURECUBE                     | \
+    D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS               | \
+    D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS          | \
+    D3D11_RESOURCE_MISC_BUFFER_STRUCTURED               | \
+    D3D11_RESOURCE_MISC_RESOURCE_CLAMP                  | \
+    D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX               | \
+    D3D11_RESOURCE_MISC_GDI_COMPATIBLE                  | \
+    D3D11_RESOURCE_MISC_SHARED_NTHANDLE                 | \
+    D3D11_RESOURCE_MISC_RESTRICTED_CONTENT              | \
+    D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE        | \
+    D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE_DRIVER | \
+    D3D11_RESOURCE_MISC_GUARDED                         | \
+    D3D11_RESOURCE_MISC_TILE_POOL                       | \
+    D3D11_RESOURCE_MISC_TILED                           | \
+    D3D11_RESOURCE_MISC_HW_PROTECTED                    )
 
 namespace wdi
 {
 	class ID3D11DeviceContextX;
 	struct D3D11X_COUNTER_SET_DESC;
 	struct D3D11X_DESCRIPTOR_RESOURCE;
-	struct D3D11_DMA_ENGINE_CONTEXT_DESC;
 	struct D3D11X_SAMPLER_DESC;
 	struct D3D11X_RENDERABLE_TEXTURE_ADDRESSES;
 	struct D3D11X_DRIVER_STATISTICS;
@@ -44,8 +67,46 @@ namespace wdi
 	struct D3D11X_DESCRIPTOR_SAMPLER_STATE;
 	class ID3D11CounterSetX;
 	class ID3D11CounterSampleX;
-	class ID3D11DmaEngineContextX;
 	class ID3D11ComputeContextX;
+
+	struct D3D11_DMA_ENGINE_CONTEXT_DESC {
+		UINT CreateFlags;
+		UINT RingBufferSizeBytes;
+		UINT SegmentSizeBytes;
+	};
+
+	D3DINTERFACE(ID3D11DmaEngineContextX, A6332DDB, 8E02, 427D, B0, B7, 34, A1, E6, 1A, 64, 88) : public ID3D11DeviceChild {
+	public:
+		virtual void STDMETHODCALLTYPE GetDevice(::ID3D11Device** ppDevice) override = 0;
+		virtual HRESULT STDMETHODCALLTYPE GetPrivateData(REFGUID guid, UINT* pDataSize, void* pData) override = 0;
+		virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID guid, UINT DataSize, const void* pData) override = 0;
+		virtual HRESULT STDMETHODCALLTYPE SetPrivateDataInterface(REFGUID guid, const IUnknown* pData) override = 0;
+		virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject) override = 0;
+		virtual ULONG STDMETHODCALLTYPE AddRef(void) override = 0;
+		virtual ULONG STDMETHODCALLTYPE Release(void) override = 0;
+		virtual D3D11_DEVICE_CONTEXT_TYPE GetType(ID3D11DmaEngineContextX* pDmaEngineContextX) = 0;
+		virtual void CopyResource(ID3D11DmaEngineContextX* pDmaEngineContextX, ID3D11Resource* pDstResource, ID3D11Resource* pSrcResource, UINT CopyFlags) = 0;
+		virtual void CopySubresourceRegion(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) = 0;
+		virtual HRESULT LZDecompressBuffer(ID3D11Buffer* pDstBuffer, UINT DstOffsetBytes, ID3D11Buffer* pSrcBuffer, UINT SrcOffsetBytes, UINT SrcSizeBytes, UINT CopyFlags) = 0;
+		virtual HRESULT LZDecompressTexture(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Buffer* pSrcBuffer, UINT CopyFlags) = 0;
+		virtual HRESULT LZCompressBuffer(ID3D11Buffer* pDstBuffer, UINT DstOffsetBytes, ID3D11Buffer* pSrcBuffer, UINT SrcOffsetBytes, UINT SrcSizeBytes, UINT CopyFlags) = 0;
+		virtual HRESULT LZCompressTexture(ID3D11Buffer* pDstBuffer, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) = 0;
+		virtual HRESULT JPEGDecode(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Buffer* pSrcBuffer, UINT CopyFlags) = 0;
+		virtual UINT64 InsertFence(UINT Flags) = 0;
+		virtual void InsertWaitOnFence(UINT Flags, uint64_t Fence) = 0;
+		virtual HRESULT Submit() = 0;
+		virtual void CopyLastErrorCodeToMemory(void* pAddress) = 0;
+		virtual void CopyLastErrorCodeToBuffer(ID3D11Buffer* pDstBuffer, UINT OffsetBytes) = 0;
+		virtual void CopyMemoryToMemory(void* pDstAddress, void* pSrcAddress, size_t SizeBytes) = 0;
+		virtual void FillMemoryWithValue(void* pDstAddress, size_t SizeBytes, UINT FillValue) = 0;
+		virtual void FillResourceWithValue(ID3D11Resource* pDstResource, UINT FillValue) = 0;
+		virtual HRESULT LZDecompressMemory(void* pDstAddress, void* pSrcAddress, UINT SrcSizeBytes, UINT CopyFlags) = 0;
+		virtual HRESULT LZCompressMemory(void* pDstAddress, void* pSrcAddress, UINT SrcSizeBytes, UINT CopyFlags) = 0;
+		virtual void WriteTimestampToMemory(void* pDstAddress) = 0;
+		virtual void WriteTimestampToBuffer(ID3D11Buffer* pBuffer, UINT OffsetBytes) = 0;
+		virtual void WriteValueBottomOfPipe(void* pDestination, UINT Value) = 0;
+		virtual void InsertWaitOnMemory(const void* pAddress, UINT Flags, D3D11_COMPARISON_FUNC ComparisonFunction, UINT ReferenceValue, UINT Mask) = 0;
+	};
 
 	typedef UINT (*D3D11XHANGBEGINCALLBACK)(UINT64 Flags);
 	typedef void (*D3D11XHANGPRINTCALLBACK)(const CHAR* strLine);
@@ -268,6 +329,113 @@ namespace wdi
 		virtual HRESULT (SetGpuMemoryPriority)(UINT Priority) = 0;
 		virtual void (GetGpuHardwareConfiguration)(D3D11X_GPU_HARDWARE_CONFIGURATION* pGpuHardwareConfiguration) = 0;
 	};
+
+	D3DINTERFACE(ID3D11PerformanceDeviceX, 88671610, 712E, 4F1E, 84, AB, 01, B5, 94, 8B, D3, 73) : public wd::graphics_unknown
+	{
+	public:
+		UINT m_CreationFlags;
+
+		virtual HRESULT(CreateBuffer)(const D3D11_BUFFER_DESC* pDesc,
+									   const D3D11_SUBRESOURCE_DATA* pInitialData,
+									   ID3D11Buffer** ppBuffer) = 0;
+		virtual HRESULT(CreateTexture1D)(const D3D11_TEXTURE1D_DESC* pDesc,
+										  _In_reads_opt_(_Inexpressible_(pDesc->MipLevels* pDesc->ArraySize)) const
+										  D3D11_SUBRESOURCE_DATA* pInitialData,
+										  ID3D11Texture1D** ppTexture1D) = 0;
+		virtual HRESULT(CreateTexture2D)(const D3D11_TEXTURE2D_DESC* pDesc,
+										  _In_reads_opt_(_Inexpressible_(pDesc->MipLevels* pDesc->ArraySize)) const
+										  D3D11_SUBRESOURCE_DATA* pInitialData,
+										  ID3D11Texture2D** ppTexture2D) = 0;
+		virtual HRESULT(CreateTexture3D)(const D3D11_TEXTURE3D_DESC* pDesc,
+										  _In_reads_opt_(_Inexpressible_(pDesc->MipLevels)) const D3D11_SUBRESOURCE_DATA
+										  * pInitialData, ID3D11Texture3D** ppTexture3D) = 0;
+		virtual HRESULT(CreateShaderResourceView)(ID3D11Resource* pResource,
+												   const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc,
+												   ID3D11ShaderResourceView** ppSRView) = 0;
+		virtual HRESULT(CreateUnorderedAccessView)(ID3D11Resource* pResource,
+													const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
+													ID3D11UnorderedAccessView** ppUAView) = 0;
+		virtual HRESULT(CreateRenderTargetView)(ID3D11Resource* pResource,
+												 const D3D11_RENDER_TARGET_VIEW_DESC* pDesc,
+												 ID3D11RenderTargetView** ppRTView) = 0;
+		virtual HRESULT(CreateDepthStencilView)(ID3D11Resource* pResource,
+												 const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc,
+												 ID3D11DepthStencilView** ppDepthStencilView) = 0;
+		virtual HRESULT(CreateInputLayout)(_In_reads_(NumElements) const D3D11_INPUT_ELEMENT_DESC* pInputElementDescs,
+											_In_range_(0, D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT) UINT
+											NumElements,
+											_In_reads_(BytecodeLength) const void* pShaderBytecodeWithInputSignature,
+											SIZE_T BytecodeLength, ID3D11InputLayout** ppInputLayout) = 0;
+		virtual HRESULT(CreateVertexShader)(_In_reads_(BytecodeLength) const void* pShaderBytecode,
+											 SIZE_T BytecodeLength, ID3D11ClassLinkage* pClassLinkage,
+											 ID3D11VertexShader** ppVertexShader) = 0;
+		virtual HRESULT(CreateGeometryShader)(
+			_In_reads_(BytecodeLength) const void* pShaderBytecode, SIZE_T BytecodeLength,
+			ID3D11ClassLinkage* pClassLinkage, ID3D11GeometryShader** ppGeometryShader) = 0;
+		virtual HRESULT(CreateGeometryShaderWithStreamOutput)(
+			_In_reads_(BytecodeLength) const void* pShaderBytecode, SIZE_T BytecodeLength,
+			_In_reads_opt_(NumEntries) const D3D11_SO_DECLARATION_ENTRY* pSODeclaration,
+			_In_range_(0, D3D11_SO_STREAM_COUNT* D3D11_SO_OUTPUT_COMPONENT_COUNT) UINT NumEntries,
+			_In_reads_opt_(NumStrides) const UINT* pBufferStrides,
+			_In_range_(0, D3D11_SO_BUFFER_SLOT_COUNT) UINT NumStrides, UINT RasterizedStream,
+			ID3D11ClassLinkage* pClassLinkage, ID3D11GeometryShader** ppGeometryShader) = 0;
+		virtual HRESULT(CreatePixelShader)(_In_reads_(BytecodeLength) const void* pShaderBytecode,
+											SIZE_T BytecodeLength, ID3D11ClassLinkage* pClassLinkage,
+											ID3D11PixelShader** ppPixelShader) = 0;
+		virtual HRESULT(CreateHullShader)(_In_reads_(BytecodeLength) const void* pShaderBytecode,
+										   SIZE_T BytecodeLength, ID3D11ClassLinkage* pClassLinkage,
+										   ID3D11HullShader** ppHullShader) = 0;
+		virtual HRESULT(CreateDomainShader)(_In_reads_(BytecodeLength) const void* pShaderBytecode,
+											 SIZE_T BytecodeLength, ID3D11ClassLinkage* pClassLinkage,
+											 ID3D11DomainShader** ppDomainShader) = 0;
+		virtual HRESULT(CreateComputeShader)(
+			_In_reads_(BytecodeLength) const void* pShaderBytecode, SIZE_T BytecodeLength,
+			ID3D11ClassLinkage* pClassLinkage, ID3D11ComputeShader** ppComputeShader) = 0;
+		virtual HRESULT(CreateClassLinkage)(ID3D11ClassLinkage** ppLinkage) = 0;
+		virtual HRESULT(CreateBlendState)(const D3D11_BLEND_DESC* pBlendStateDesc,
+										   ID3D11BlendState** ppBlendState) = 0;
+		virtual HRESULT(CreateDepthStencilState)(const D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc,
+												  ID3D11DepthStencilState** ppDepthStencilState) = 0;
+		virtual HRESULT(CreateRasterizerState)(const D3D11_RASTERIZER_DESC* pRasterizerDesc,
+												ID3D11RasterizerState** ppRasterizerState) = 0;
+		virtual HRESULT(CreateSamplerState)(const D3D11_SAMPLER_DESC* pSamplerDesc,
+											 ID3D11SamplerState** ppSamplerState) = 0;
+		virtual HRESULT(CreateQuery)(const D3D11_QUERY_DESC* pQueryDesc, ID3D11Query** ppQuery) = 0;
+		virtual HRESULT(CreatePredicate)(const D3D11_QUERY_DESC* pPredicateDesc,
+										  ID3D11Predicate** ppPredicate) = 0;
+		virtual HRESULT(CreateCounter)(const D3D11_COUNTER_DESC* pCounterDesc,
+										ID3D11Counter** ppCounter) = 0;
+		// @Patoke todo: make this access wdi::ID3D11DeviceContext instead, this is a temporary fix
+		virtual HRESULT(CreateDeferredContext)(UINT ContextFlags, ::ID3D11DeviceContext** ppDeferredContext) = 0;
+		virtual HRESULT(OpenSharedResource)(HANDLE hResource, REFIID ReturnedInterface,
+											 void** ppResource) = 0;
+		virtual HRESULT(CheckFormatSupport)(DXGI_FORMAT Format, UINT* pFormatSupport) = 0;
+		virtual HRESULT(CheckMultisampleQualityLevels)(DXGI_FORMAT Format, UINT SampleCount,
+														UINT* pNumQualityLevels) = 0;
+		virtual void (CheckCounterInfo)(D3D11_COUNTER_INFO* pCounterInfo) = 0;
+		virtual HRESULT(CheckCounter)(const D3D11_COUNTER_DESC* pDesc, D3D11_COUNTER_TYPE* pType,
+									   UINT* pActiveCounters, _Out_writes_opt_(*pNameLength) LPSTR szName,
+									   _Inout_opt_ UINT* pNameLength, _Out_writes_opt_(*pUnitsLength) LPSTR szUnits,
+									   _Inout_opt_ UINT* pUnitsLength,
+									   _Out_writes_opt_(*pDescriptionLength) LPSTR szDescription,
+									   _Inout_opt_ UINT* pDescriptionLength) = 0;
+		virtual HRESULT(CheckFeatureSupport)(D3D11_FEATURE Feature,
+											  _Out_writes_bytes_(FeatureSupportDataSize) void* pFeatureSupportData,
+											  UINT FeatureSupportDataSize) = 0;
+		virtual HRESULT(GetPrivateData)(REFGUID guid, UINT* pDataSize,
+										 _Out_writes_bytes_opt_(*pDataSize) void* pData) = 0;
+		virtual HRESULT(SetPrivateData)(REFGUID guid, UINT DataSize,
+										 _In_reads_bytes_opt_(DataSize) const void* pData) = 0;
+		virtual HRESULT(SetPrivateDataInterface)(REFGUID guid, const IUnknown* pData) = 0;
+		virtual HRESULT(SetPrivateDataInterfaceGraphics)(REFGUID guid, const IGraphicsUnknown* pData) = 0;
+		virtual D3D_FEATURE_LEVEL(GetFeatureLevel)() = 0;
+		virtual UINT(GetCreationFlags)() = 0;
+		virtual HRESULT(GetDeviceRemovedReason)() = 0;
+		// @Patoke todo: make this access wdi::ID3D11DeviceContext instead, this is a temporary fix
+		virtual void (GetImmediateContext)(::ID3D11DeviceContext** ppImmediateContext) = 0;
+		virtual HRESULT(SetExceptionMode)(UINT RaiseFlags) = 0;
+		virtual UINT(GetExceptionMode)() = 0;
+	};
 }
 
 namespace wd
@@ -285,10 +453,10 @@ namespace wd
 				return E_POINTER;
 			}
 
-			if (riid == __uuidof(wdi::ID3D11DeviceX) || riid == __uuidof(wdi::ID3D11Device) || riid == __uuidof(wdi::ID3D11Device1) || riid == __uuidof(wdi::ID3D11Device2))
+			if (riid == __uuidof(wdi::ID3D11DeviceX) || riid == __uuidof(wdi::ID3D11Device) || riid == __uuidof(wdi::ID3D11Device1) || riid == __uuidof(wdi::ID3D11Device2) || riid == __uuidof(wdi::ID3D11PerformanceDeviceX))
 			{
 				*ppvObject = static_cast<wdi::ID3D11DeviceX*>(this);
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -460,19 +628,19 @@ namespace wd
 			//return wrapped_interface->SetPrivateDataInterfaceGraphics(guid, pData);
 		}
 
-		D3D_FEATURE_LEVEL GetFeatureLevel( ) override
+		D3D_FEATURE_LEVEL GetFeatureLevel() override
 		{
-			return wrapped_interface->GetFeatureLevel( );
+			return wrapped_interface->GetFeatureLevel();
 		}
 
-		UINT GetCreationFlags( ) override
+		UINT GetCreationFlags() override
 		{
-			return wrapped_interface->GetCreationFlags( );
+			return wrapped_interface->GetCreationFlags();
 		}
 
-		HRESULT GetDeviceRemovedReason( ) override
+		HRESULT GetDeviceRemovedReason() override
 		{
-			return wrapped_interface->GetDeviceRemovedReason( );
+			return wrapped_interface->GetDeviceRemovedReason();
 		}
 
 		void GetImmediateContext(ID3D11DeviceContext** ppImmediateContext) override;
@@ -482,9 +650,9 @@ namespace wd
 			return wrapped_interface->SetExceptionMode(RaiseFlags);
 		}
 
-		UINT GetExceptionMode( ) override
+		UINT GetExceptionMode() override
 		{
-			return wrapped_interface->GetExceptionMode( );
+			return wrapped_interface->GetExceptionMode();
 		}
 
 		// ID3D11Device1 methods
@@ -594,5 +762,48 @@ namespace wd
 		void GetGpuHardwareConfiguration(wdi::D3D11X_GPU_HARDWARE_CONFIGURATION* pGpuHardwareConfiguration) override;
 	private:
 		::ID3D11Device2* wrapped_interface;
+
+		wdi::D3D11XHANGBEGINCALLBACK m_HangBeginCallback = nullptr;
+		wdi::D3D11XHANGPRINTCALLBACK m_HangPrintCallback = nullptr;
+		wdi::D3D11XHANGDUMPCALLBACK  m_HangDumpCallback = nullptr;
+	};
+
+	class D3D11DmaEngineContextX : public wdi::ID3D11DmaEngineContextX {
+	public:
+		D3D11DmaEngineContextX(wdi::D3D11_DMA_ENGINE_CONTEXT_DESC desc, ::ID3D11Device2* pWrapped_interface) : pDesc(desc), wrapped_interface(pWrapped_interface), refCount(1) {}// Possibly Unneccary
+
+		virtual void STDMETHODCALLTYPE GetDevice(::ID3D11Device** ppDevice) override;
+		virtual HRESULT STDMETHODCALLTYPE GetPrivateData(REFGUID guid, UINT* pDataSize, void* pData) override;
+		virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID guid, UINT DataSize, const void* pData) override;
+		virtual HRESULT STDMETHODCALLTYPE SetPrivateDataInterface(REFGUID guid, const IUnknown* pData) override;
+		virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject) override;
+		virtual ULONG STDMETHODCALLTYPE AddRef() override;
+		virtual ULONG STDMETHODCALLTYPE Release() override;
+		virtual D3D11_DEVICE_CONTEXT_TYPE GetType(ID3D11DmaEngineContextX* pDmaEngineContextX) override;
+		virtual void CopyResource(ID3D11DmaEngineContextX* pDmaEngineContextX, ID3D11Resource* pDstResource, ID3D11Resource* pSrcResource, UINT CopyFlags) override;
+		virtual void CopySubresourceRegion(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) override;
+		virtual HRESULT LZDecompressBuffer(ID3D11Buffer* pDstBuffer, UINT DstOffsetBytes, ID3D11Buffer* pSrcBuffer, UINT SrcOffsetBytes, UINT SrcSizeBytes, UINT CopyFlags) override;
+		virtual HRESULT LZDecompressTexture(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Buffer* pSrcBuffer, UINT CopyFlags) override;
+		virtual HRESULT LZCompressBuffer(ID3D11Buffer* pDstBuffer, UINT DstOffsetBytes, ID3D11Buffer* pSrcBuffer, UINT SrcOffsetBytes, UINT SrcSizeBytes, UINT CopyFlags) override;
+		virtual HRESULT LZCompressTexture(ID3D11Buffer* pDstBuffer, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) override;
+		virtual HRESULT JPEGDecode(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Buffer* pSrcBuffer, UINT CopyFlags) override;
+		virtual UINT64 InsertFence(UINT Flags) override;
+		virtual void InsertWaitOnFence(UINT Flags, uint64_t Fence) override;
+		virtual HRESULT Submit( ) override;
+		virtual void CopyLastErrorCodeToMemory(void* pAddress) override;
+		virtual void CopyLastErrorCodeToBuffer(ID3D11Buffer* pDstBuffer, UINT OffsetBytes) override;
+		virtual void CopyMemoryToMemory(void* pDstAddress, void* pSrcAddress, size_t SizeBytes) override;
+		virtual void FillMemoryWithValue(void* pDstAddress, size_t SizeBytes, UINT FillValue) override;
+		virtual void FillResourceWithValue(ID3D11Resource* pDstResource, UINT FillValue) override;
+		virtual HRESULT LZDecompressMemory(void* pDstAddress, void* pSrcAddress, UINT SrcSizeBytes, UINT CopyFlags) override;
+		virtual HRESULT LZCompressMemory(void* pDstAddress, void* pSrcAddress, UINT SrcSizeBytes, UINT CopyFlags) override;
+		virtual void WriteTimestampToMemory(void* pDstAddress) override;
+		virtual void WriteTimestampToBuffer(ID3D11Buffer* pBuffer, UINT OffsetBytes) override;
+		virtual void WriteValueBottomOfPipe(void* pDestination, UINT Value) override;
+		virtual void InsertWaitOnMemory(const void* pAddress, UINT Flags, D3D11_COMPARISON_FUNC ComparisonFunction, UINT ReferenceValue, UINT Mask) override;
+	private:
+		wdi::D3D11_DMA_ENGINE_CONTEXT_DESC pDesc;
+		::ID3D11Device2* wrapped_interface;
+		std::atomic<ULONG> refCount;
 	};
 }

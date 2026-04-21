@@ -59,4 +59,9 @@ typedef struct _TITLEMEMORYSTATUS {
 	DWORDLONG ullLegacyAvail;
 	DWORDLONG ullTitleUsed;
 	DWORDLONG ullTitleAvail;
+	/* Xbox TitleMemoryStatus buffer is 80 bytes; kernel fills DWORDs at +64 and +72 (see TitleMemoryStatus_X). */
+	DWORD ExtensionDword64;
+	DWORD Reserved68;
+	DWORD ExtensionDword72;
+	DWORD Reserved76;
 } TITLEMEMORYSTATUS, * PTITLEMEMORYSTATUS, * LPTITLEMEMORYSTATUS;

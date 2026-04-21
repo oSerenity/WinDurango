@@ -1,21 +1,3 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
 #pragma once
 #include "dxgi_object.hpp"
 
@@ -49,7 +31,7 @@ namespace wd
 	class dxgi_device : public wdi::IDXGIDevice
 	{
 	public:
-		dxgi_device(::IDXGIDevice* device) : wrapped_interface(device) { wrapped_interface->AddRef( ); }
+		dxgi_device(::IDXGIDevice* device) : wrapped_interface(device) { wrapped_interface->AddRef(); }
 
 		IGU_DEFINE_REF
 
@@ -58,7 +40,7 @@ namespace wd
 			if (riid == __uuidof(wdi::IDXGIDevice))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -86,5 +68,3 @@ namespace wd
 		::IDXGIDevice* wrapped_interface;
 	};
 }
-
-

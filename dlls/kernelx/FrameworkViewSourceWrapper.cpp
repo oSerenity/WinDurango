@@ -6,10 +6,25 @@
 
 HRESULT __stdcall FrameworkViewSourceWrapper::CreateView(ABI::Windows::ApplicationModel::Core::IFrameworkView** viewProvider)
 {
-	auto hr = m_realViewSource->CreateView(viewProvider);
+	if (!viewProvider)
+	{
+		return E_POINTER;
+	}
 
-	if (SUCCEEDED(hr))
-		*viewProvider = new FrameworkViewWrapper(*viewProvider);
+	const HRESULT hr = m_realViewSource->CreateView(viewProvider);
+	if (FAILED(hr) || !*viewProvider)
+	{
+		return hr;
+	}
+
+	// CreateView transfers ownership of one refcount to *viewProvider; wrap it and own that ref in ~FrameworkViewWrapper.
+	IFrameworkView* const inner = *viewProvider;
+	*viewProvider = new (std::nothrow) FrameworkViewWrapper(inner);
+	if (!*viewProvider)
+	{
+		inner->Release();
+		return E_OUTOFMEMORY;
+	}
 
 	return hr;
 }

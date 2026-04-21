@@ -1,4 +1,4 @@
-/*
+﻿/*
 ================================================================================
 DISCLAIMER AND LICENSE REQUIREMENT
 
@@ -17,7 +17,7 @@ If you do not agree to these terms, you do not have permission to use this code.
 ================================================================================
 */
 #include "overlay.h"
-
+#define IMGUI_USE_WCHAR32
 #include "../../../thirdparty/imgui/imgui.h"
 #include "../../../thirdparty/imgui/backends/imgui_impl_dx11.h"
 #include "../../../thirdparty/imgui_impl_uwp.h"
@@ -41,67 +41,75 @@ wd::Overlay::Overlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, IDXGI
 {
 }
 
-wd::Overlay::~Overlay( )
+wd::Overlay::~Overlay()
 {
-    Shutdown( );
+    Shutdown();
     m_pDevice = nullptr;
     m_pContext = nullptr;
     m_pSwapchain = nullptr;
 }
-void SetupImGuiKeyboardInputUWP( );
+void SetupImGuiKeyboardInputUWP();
 ImGuiKey MapVirtualKeyToImGuiKey(winrt::Windows::System::VirtualKey key);
 
-void wd::Overlay::Initialize( )
+void wd::Overlay::Initialize()
 {
     g_KeyboardFinished = CreateEventA(NULL, FALSE, FALSE, "KeyboardFinished");
 
     ID3D11Texture2D* pBackBuffer = nullptr;
     m_pSwapchain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
     m_pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &m_pRenderTargetView);
-    if (pBackBuffer) pBackBuffer->Release( );
+    if (pBackBuffer) pBackBuffer->Release();
 
-    IMGUI_CHECKVERSION( );
-    ImGui::CreateContext( );
-    ImGuiIO& io = ImGui::GetIO( );
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    ImGui::StyleColorsDark( );
-
-    ImGui_ImplUwp_InitForCurrentView( );
+    ImGui_ImplUwp_InitForCurrentView();
     ImGui_ImplDX11_Init(m_pDevice, m_pContext);
-    SetupImGuiKeyboardInputUWP( );
+
+    [[maybe_unused]] ImFont* mainFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+
+    ImFontConfig config;
+    config.MergeMode = true;
+
+    static const ImWchar icon_ranges[] = { 0xE000, 0xF8FF, 0 };
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segmdl2.ttf", 25.0f, &config, icon_ranges);
+
+    ImGui::StyleColorsDark();
+
+    SetupImGuiKeyboardInputUWP();
 }
 
 
 
 
-void SetupImGuiKeyboardInputUWP( )
+void SetupImGuiKeyboardInputUWP()
 {
-    CoreWindow window = CoreWindow::GetForCurrentThread( );
+    CoreWindow window = CoreWindow::GetForCurrentThread();
 
     window.KeyDown(TypedEventHandler<CoreWindow, KeyEventArgs>(
         [](CoreWindow const&, KeyEventArgs const& args)
         {
-            ImGuiKey key = MapVirtualKeyToImGuiKey(args.VirtualKey( ));
+            ImGuiKey key = MapVirtualKeyToImGuiKey(args.VirtualKey());
             if (key != ImGuiKey_None)
-                ImGui::GetIO( ).AddKeyEvent(key, true);
+                ImGui::GetIO().AddKeyEvent(key, true);
         }));
 
     window.KeyUp(TypedEventHandler<CoreWindow, KeyEventArgs>(
         [](CoreWindow const&, KeyEventArgs const& args)
         {
-            ImGuiKey key = MapVirtualKeyToImGuiKey(args.VirtualKey( ));
+            ImGuiKey key = MapVirtualKeyToImGuiKey(args.VirtualKey());
             if (key != ImGuiKey_None)
-                ImGui::GetIO( ).AddKeyEvent(key, false);
+                ImGui::GetIO().AddKeyEvent(key, false);
         }));
-
+    /*
     window.CharacterReceived(TypedEventHandler<CoreWindow, CharacterReceivedEventArgs>(
         [](CoreWindow const&, CharacterReceivedEventArgs const& args)
         {
-            ImGui::GetIO( ).AddInputCharacter(static_cast<unsigned int>(args.KeyCode( )));
-        }));
+            ImGui::GetIO().AddInputCharacter(static_cast<unsigned int>(args.KeyCode()));
+        }));*/
 }
 ImGuiKey MapVirtualKeyToImGuiKey(VirtualKey key)
 {
@@ -159,30 +167,30 @@ ImGuiKey MapVirtualKeyToImGuiKey(VirtualKey key)
     }
 }
 
-void wd::Overlay::Shutdown( )
+void wd::Overlay::Shutdown()
 {
     if (m_pRenderTargetView)
     {
-        m_pRenderTargetView->Release( );
+        m_pRenderTargetView->Release();
         m_pRenderTargetView = nullptr;
     }
 
-    ImGui_ImplDX11_Shutdown( );
-    ImGui_ImplUwp_Shutdown( );
-    ImGui::DestroyContext( );
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplUwp_Shutdown();
+    ImGui::DestroyContext();
 }
 
-void wd::Overlay::EnableKeyboard( )
+void wd::Overlay::EnableKeyboard()
 {
     m_bKeyboard = true;
 }
 
-void wd::Overlay::UpdateXInput( )
+void wd::Overlay::UpdateXInput()
 {
     XINPUT_STATE state = {};
     if (XInputGetState(0, &state) == ERROR_SUCCESS)
     {
-        ImGuiIO& io = ImGui::GetIO( );
+        ImGuiIO& io = ImGui::GetIO();
 
 #define GAMEPAD_KEY(key, condition) io.AddKeyEvent(ImGuiKey_##key, (condition))
 
@@ -198,7 +206,6 @@ void wd::Overlay::UpdateXInput( )
 
 #undef GAMEPAD_KEY
 
-        // Left analog stick as analog navigation
         const float deadzone = static_cast<float>(XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
         const float maxValue = 32767.0f;
 
@@ -224,31 +231,32 @@ void wd::Overlay::UpdateXInput( )
 }
 
 
-void wd::Overlay::Present( )
+void wd::Overlay::Present()
 {
-    UpdateXInput( );
-    ImGui_ImplDX11_NewFrame( );
-    ImGui_ImplUwp_NewFrame( );
-    ImGui::NewFrame( );
+    UpdateXInput();
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplUwp_NewFrame();
+    ImGui::NewFrame();
 
     if (m_bKeyboard)
-        RenderKeyboardWindow( );
+        RenderKeyboardWindow();
 
-    ImGui::Render( );
+    ImGui::Render();
     m_pContext->OMSetRenderTargets(1, &m_pRenderTargetView, nullptr);
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData( ));
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
+static int cursorPos = 0;
 void wd::Overlay::RenderKeyboardWindow( )
 {
     static bool isUppercase = false;
     static bool isSymbols = false;
 
     const char* keys[] = {
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=",
-        "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]",
-        "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'",
-        "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+        "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
+        "A", "S", "D", "F", "G", "H", "J", "K", "L", "'",
+        "Z", "X", "C", "V", "B", "N", "M", ",", ".", "?"
     };
 
     const char* symbols[] = {
@@ -260,78 +268,318 @@ void wd::Overlay::RenderKeyboardWindow( )
     const char** currentKeys = isSymbols ? symbols : keys;
 
     ImGuiIO& io = ImGui::GetIO( );
-    ImGui::SetNextWindowSize(ImVec2(500, 330));
-    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-    ImGui::Begin("WinDurango Keyboard", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    ImVec2 displaySize = ImGui::GetIO( ).DisplaySize;
 
-    ImGui::InputText(" ", g_KeyboardText, IM_ARRAYSIZE(g_KeyboardText));
+    ImGui::SetNextWindowPos(ImVec2(displaySize.x / 2, displaySize.y / 2), ImGuiCond_Always);
 
-    if (ImGui::Button(isUppercase ? "Lowercase" : "Uppercase"))
-        isUppercase = !isUppercase;
-    ImGui::SameLine( );
-    if (ImGui::Button(isSymbols ? "Letters" : "Symbols"))
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0x05, 0x05, 0x05, 0xFF));
+    ImGui::Begin("Keyboard", nullptr, windowFlags);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0x37, 0x37, 0x37, 0xFF));
+    ImGui::PushItemWidth(-FLT_MIN);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0x05, 0x05, 0x05, 0xFF));
+    ImGui::InputText("", g_KeyboardText, IM_ARRAYSIZE(g_KeyboardText), ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_ReadOnly,
+    [](ImGuiInputTextCallbackData* data) -> int {
+        data->CursorPos = cursorPos;
+        return 0;
+    });
+    ImGui::PopStyleColor( );
+    ImGui::PopItemWidth( );
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
+
+    if (ImGui::Button("##symb", ImVec2(60, 30)))
         isSymbols = !isSymbols;
 
-    ImGui::NewLine( );
-    RenderKeyboardRow(currentKeys, 0, 12, isUppercase);
-    RenderKeyboardRow(currentKeys, 12, 24, isUppercase);
-    if (!isSymbols) RenderKeyboardRow(currentKeys, 24, 35, isUppercase);
-    else            RenderKeyboardRow(currentKeys, 24, 32, isUppercase);
-    if (!isSymbols) RenderKeyboardRow(currentKeys, 35, 44, isUppercase);
+    ImVec2 pos = ImGui::GetItemRectMin( );
+    ImVec2 size = ImGui::GetItemRectSize( );
 
-    ImGui::NewLine( );
+    if (!isSymbols) {
+        ImVec2 textSize = ImGui::CalcTextSize("#+=");
+        ImGui::GetWindowDrawList( )->AddText(
+            ImGui::GetFont( ), ImGui::GetFontSize( ),
+            ImVec2((pos.x + (size.x - textSize.x) * 0.5f) - 10, pos.y + (size.y - textSize.y) * 0.5f),
+            IM_COL32(255, 255, 255, 255),
+            "#+="
+        );
+    }
+    else {
+        ImVec2 textSize = ImGui::CalcTextSize("ABC");
+        ImGui::GetWindowDrawList( )->AddText(
+            ImGui::GetFont( ), ImGui::GetFontSize( ),
+            ImVec2((pos.x + (size.x - textSize.x) * 0.5f) - 10, pos.y + (size.y - textSize.y) * 0.5f),
+            IM_COL32(255, 255, 255, 255),
+            "ABC"
+        );
+    }
+
+    ImVec2 iconSize = ImGui::CalcTextSize("\xEF\x84\x8A");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 12,
+        ImVec2((pos.x + (size.x - iconSize.x) * 0.5f) + 18, (pos.y + (size.y - iconSize.y) * 0.5f) + 8),
+        IM_COL32(255, 255, 255, 255),
+        "\xEF\x84\x8A"
+    );
+
+    ImGui::SameLine( );
+    RenderKeyboardRow(currentKeys, 0, 10, isUppercase);
+
+    ImGui::PopStyleVar( );
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 3));
+    ImGui::SameLine( );
+    if (ImGui::Button("##del", ImVec2(60, 30)) ||
+        ImGui::IsKeyPressed(ImGuiKey_Backspace) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadFaceLeft)) {
+        size_t len = strlen(g_KeyboardText);
+        if (len > 0) {
+            g_KeyboardText[ len - 1 ] = '\0';
+            cursorPos = max(0, cursorPos - 1);
+        }
+    }
+    ImVec2 posa = ImGui::GetItemRectMin( );
+    ImVec2 sizea = ImGui::GetItemRectSize( );
+
+    ImVec2 textSizea = ImGui::CalcTextSize("\xEE\x9D\x90");
+
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ),
+        14,
+        ImVec2((posa.x + (sizea.x - textSizea.x) * 0.5f) - 6, (posa.y + (sizea.y - textSizea.y) * 0.5f) + 7),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\x9D\x90"
+    );
+
+    textSizea = ImGui::CalcTextSize("\xEF\x82\x96");
+
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ),
+        10,
+        ImVec2((posa.x + (sizea.x - textSizea.x) * 0.5f) + 18, (posa.y + (sizea.y - textSizea.y) * 0.5f) + 8),
+        IM_COL32(0, 149, 209, 255),
+        "\xEF\x82\x96"
+    );
+    ImGui::PopStyleVar( );
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
+
+    if (ImGui::Button("##bac", ImVec2(60.0f, 63)) ||
+        ImGui::IsKeyPressed(ImGuiKey_LeftShift) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadL1))
+        cursorPos = max(0, cursorPos - 1);
+
+    pos = ImGui::GetItemRectMin( );
+    size = ImGui::GetItemRectSize( );
+
+    ImFont* bigFont = ImGui::GetFont( );
+    float bigFontSize = 18.0f;
+    ImVec2 bigTextSize = ImGui::CalcTextSize("\xEE\xA5\xAF");
+    ImGui::GetWindowDrawList( )->AddText(
+        bigFont, bigFontSize,
+        ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) - 3, pos.y + 18),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\x80\x8E"
+    );
+
+    ImFont* smallFont = bigFont;
+    float smallFontSize = 14.0f;
+    ImVec2 smallTextSize = ImGui::CalcTextSize("\xEF\x84\x8C");
+    ImGui::GetWindowDrawList( )->AddText(
+        smallFont, smallFontSize,
+        ImVec2(pos.x + (size.x - smallTextSize.x) * 0.5f, pos.y + 26 + bigTextSize.y),
+        IM_COL32(255, 255, 255, 255),
+        "\xEF\x84\x8C"
+    );
+
+    ImGui::SameLine( );
+    ImVec2 currPos = ImGui::GetCursorPos( );
+    RenderKeyboardRow(currentKeys, 10, 20, isUppercase);
+
+    ImGui::PopStyleVar( );
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 3));
+    ImGui::SameLine( );
+    ImGui::SetWindowFontScale(1.5f);
+    if (ImGui::Button("##for", ImVec2(60.0f, 63)))
+        cursorPos++;
+
+    pos = ImGui::GetItemRectMin( );
+    size = ImGui::GetItemRectSize( );
+
+    bigTextSize = ImGui::CalcTextSize("\xEE\x80\x8F");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 18,
+        ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) + 6, pos.y + 18),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\x80\x8F"
+    );
+
+    smallTextSize = ImGui::CalcTextSize("\xEF\x84\x8D");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 14,
+        ImVec2((pos.x + (size.x - smallTextSize.x) * 0.5f) + 8, pos.y + 20 + bigTextSize.y),
+        IM_COL32(255, 255, 255, 255),
+        "\xEF\x84\x8D"
+    );
+    ImGui::SetWindowFontScale(1.0f);
+
+    ImGui::PopStyleVar( );
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
+
+    ImVec2 row2Pos = ImGui::GetCursorPos( );
+    row2Pos.x = currPos.x;
+    row2Pos.y -= 33;
+    ImGui::SetCursorPos(row2Pos);
+    if (!isSymbols) RenderKeyboardRow(currentKeys, 20, 30, isUppercase);
+    else            RenderKeyboardRow(currentKeys, 20, 30, isUppercase);
+
+    if (ImGui::Button("##upper", ImVec2(60.0f, 63)))
+        isUppercase = !isUppercase;
+
+    pos = ImGui::GetItemRectMin( );
+    size = ImGui::GetItemRectSize( );
+
+    if (!isUppercase) {
+        bigTextSize = ImGui::CalcTextSize("\xEE\x9D\x92");
+        ImGui::GetWindowDrawList( )->AddText(
+            ImGui::GetFont( ), 18,
+            ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) - 3, pos.y + 18),
+            IM_COL32(255, 255, 255, 255),
+            "\xEE\x9D\x92"
+        );
+    }
+    else {
+        bigTextSize = ImGui::CalcTextSize("\xEE\xA2\x96");
+        ImGui::GetWindowDrawList( )->AddText(
+            ImGui::GetFont( ), 18,
+            ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) - 3, pos.y + 18),
+            IM_COL32(255, 255, 255, 255),
+            "\xEE\xA2\x96"
+        );
+    }
+
+    smallTextSize = ImGui::CalcTextSize("\xEF\x84\x88");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 14,
+        ImVec2(pos.x + (size.x - smallTextSize.x) * 0.5f, pos.y + 26 + bigTextSize.y),
+        IM_COL32(255, 255, 255, 255),
+        "\xEF\x84\x88"
+    );
+
+    ImGui::SameLine( );
+    currPos = ImGui::GetCursorPos( );
+    if (!isSymbols) RenderKeyboardRow(currentKeys, 30, 40, isUppercase);
+
+    ImGui::PopStyleVar( );
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 3));
+    ImGui::SameLine( );
+    if (ImGui::Button("##enter", ImVec2(60.0f, 63)) ||
+        ImGui::IsKeyPressed(ImGuiKey_Enter) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadStart)) {
+        m_bKeyboard = false;
+        SetEvent(g_KeyboardFinished);
+        cursorPos = 0;
+    }
+    pos = ImGui::GetItemRectMin( );
+    size = ImGui::GetItemRectSize( );
+
+    bigTextSize = ImGui::CalcTextSize("\xEE\xAF\xA7");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 18,
+        ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) + 2, pos.y + 18),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\xAF\xA7"
+    );
+
+    smallTextSize = ImGui::CalcTextSize("\xEE\xB7\xA3");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 12,
+        ImVec2((pos.x + (size.x - smallTextSize.x) * 0.5f) + 5, pos.y + 26 + bigTextSize.y),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\xB7\xA3"
+    );
+    ImGui::PopStyleVar( );
+
+    row2Pos = ImGui::GetCursorPos( );
+    row2Pos.x = currPos.x;
+    row2Pos.y -= 33;
+    ImGui::SetCursorPos(row2Pos);
+
     HandleKeyboardSpecialKeys( );
 
+    ImGui::PopStyleVar( );
+    ImGui::PopStyleColor( );
     ImGui::End( );
+    ImGui::PopStyleColor( );
+
+    for (int i = 0; i < io.InputQueueCharacters.Size; i++)
+    {
+        ImWchar c = io.InputQueueCharacters[ i ];
+        if (c >= 32 && c < 127)
+        {
+            size_t len = strlen(g_KeyboardText);
+            if (len + 1 < IM_ARRAYSIZE(g_KeyboardText))
+            {
+                g_KeyboardText[ len ] = (char) c;
+                g_KeyboardText[ len + 1 ] = '\0';
+                cursorPos++;
+            }
+        }
+    }
+    io.InputQueueCharacters.clear( );
 }
 
 void wd::Overlay::RenderKeyboardRow(const char** keys, int start, int end, bool isUppercase)
 {
-    ImVec2 buttonSize(30, 30);
+    ImVec2 buttonSize(45, 30);
     for (int i = start; i < end; ++i)
     {
         ImGui::PushID(i);
         if (ImGui::Button(keys[ i ], buttonSize))
             AddKeyToBuffer(isUppercase ? keys[ i ][ 0 ] : tolower(keys[ i ][ 0 ]));
-        ImGui::PopID( );
-        ImGui::SameLine( );
+        ImGui::PopID();
+        ImGui::SameLine();
     }
-    ImGui::NewLine( );
+    ImGui::NewLine();
 }
 
 void wd::Overlay::AddKeyToBuffer(char c)
 {
     size_t len = strlen(g_KeyboardText);
-    if (len < 255)
-    {
-        g_KeyboardText[ len ] = c;
-        g_KeyboardText[ len + 1 ] = '\0';
-    }
+    if (len >= 255 || cursorPos > len)
+        return;
+
+    for (size_t i = len; i > cursorPos; --i)
+        g_KeyboardText[ i ] = g_KeyboardText[ i - 1 ];
+
+    g_KeyboardText[ cursorPos ] = c;
+    g_KeyboardText[ len + 1 ] = '\0';
+    cursorPos++;
 }
 
-void wd::Overlay::HandleKeyboardSpecialKeys( )
+void wd::Overlay::HandleKeyboardSpecialKeys()
 {
     ImVec2 buttonSize(30, 30);
 
-    if (ImGui::Button("Space", ImVec2(60, 30)) || ImGui::IsKeyPressed(ImGuiKey_Space) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceUp))
+    if (ImGui::Button("##space", ImVec2((ImGui::GetContentRegionAvail( ).x - 63), 30)) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceUp))
         AddKeyToBuffer(' ');
-    ImGui::SameLine( );
 
-    if (ImGui::Button("Backspace", ImVec2(90, 30)) ||
-        ImGui::IsKeyPressed(ImGuiKey_Backspace) ||
-        ImGui::IsKeyPressed(ImGuiKey_GamepadFaceLeft))
-    {
-        size_t len = strlen(g_KeyboardText);
-        if (len > 0)
-            g_KeyboardText[ len - 1 ] = '\0';
-    }
-    ImGui::SameLine( );
+    ImVec2 pos = ImGui::GetItemRectMin( );
+    ImVec2 size = ImGui::GetItemRectSize( );
 
-    if (ImGui::Button("OK", buttonSize) ||
-        ImGui::IsKeyPressed(ImGuiKey_Enter) ||
-        ImGui::IsKeyPressed(ImGuiKey_GamepadStart))
-    {
-        m_bKeyboard = false;
-        SetEvent(g_KeyboardFinished);
-    }
+    ImVec2 bigTextSize = ImGui::CalcTextSize("\xEE\x9D\x9D");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 18,
+        ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) - 18, pos.y + 18),
+        IM_COL32(255, 255, 255, 255),
+        "\xEE\x9D\x9D"
+    );
+
+    ImVec2 smallTextSize = ImGui::CalcTextSize("\xEF\x82\x95");
+    ImGui::GetWindowDrawList( )->AddText(
+        ImGui::GetFont( ), 14,
+        ImVec2((pos.x + (size.x - bigTextSize.x) * 0.5f) + 12, pos.y + 14),
+        IM_COL32(250, 161, 25, 255),
+        "\xEF\x82\x95"
+    );
 }

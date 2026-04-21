@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "NetworkInformationWrapperX.h"
-#include "../common/Logger.h"
 
 NetworkInformationWrapperX::NetworkInformationWrapperX(INetworkInformationStatics* realNetworkInfo)
     : m_realNetworkInfo(realNetworkInfo)

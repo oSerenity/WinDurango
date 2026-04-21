@@ -1,7 +1,8 @@
 #pragma once
+#include <common.h>
+
 #include "device_child_x.h"
 #include "device_context_x.h"
-#include "../common/Logger.h"
 
 namespace wdi
 {
@@ -58,53 +59,53 @@ namespace wd
 	public:
 		void GetDevice(ID3D11Device** ppDevice) override
 		{
-			LOG_NOT_IMPLEMENTED( );
+			LOG_NOT_IMPLEMENTED();
 			throw std::logic_error("Not implemented");
 		}
 
 		HRESULT GetPrivateData(const GUID& guid, UINT* pDataSize, void* pData) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		HRESULT SetPrivateData(const GUID& guid, UINT DataSize, const void* pData) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		HRESULT SetPrivateDataInterface(const GUID& guid, const IUnknown* pData) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		HRESULT SetPrivateDataInterfaceGraphics(const GUID& guid, const IGraphicsUnknown* pData) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		HRESULT SetName(LPCWSTR pName) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		void GetType(D3D11_RESOURCE_DIMENSION* pResourceDimension) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		void SetEvictionPriority(UINT EvictionPriority) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		UINT GetEvictionPriority() override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		void GetDescriptor(wdi::D3D11X_DESCRIPTOR_RESOURCE* descriptor) override
 		{
-			LOG_NOT_IMPLEMENTED( ); throw std::logic_error("Not implemented");
+			LOG_NOT_IMPLEMENTED(); throw std::logic_error("Not implemented");
 		}
 
 		::ID3D11Resource* wrapped_interface;
@@ -112,7 +113,7 @@ namespace wd
 	class texture_1d : public wdi::ID3D11Texture1D
 	{
 	public:
-		texture_1d(::ID3D11Texture1D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef( ); }
+		texture_1d(::ID3D11Texture1D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef(); }
 
 		IGU_DEFINE_REF
 
@@ -121,7 +122,7 @@ namespace wd
 			if (riid == __uuidof(wdi::ID3D11Texture1D))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -179,7 +180,7 @@ namespace wd
 
 		UINT GetEvictionPriority() override
 		{
-			return wrapped_interface->GetEvictionPriority( );
+			return wrapped_interface->GetEvictionPriority();
 		}
 
 		void GetDescriptor(wdi::D3D11X_DESCRIPTOR_RESOURCE* descriptor) override
@@ -193,7 +194,7 @@ namespace wd
 	class texture_2d : public wdi::ID3D11Texture2D
 	{
 	public:
-		texture_2d(::ID3D11Texture2D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef( ); }
+		texture_2d(::ID3D11Texture2D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef(); }
 
 		IGU_DEFINE_REF
 
@@ -202,7 +203,7 @@ namespace wd
 			if (riid == __uuidof(wdi::ID3D11Texture2D))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -259,9 +260,9 @@ namespace wd
 			wrapped_interface->SetEvictionPriority(EvictionPriority);
 		}
 
-		UINT GetEvictionPriority( ) override
+		UINT GetEvictionPriority() override
 		{
-			return wrapped_interface->GetEvictionPriority( );
+			return wrapped_interface->GetEvictionPriority();
 		}
 
 		void GetDescriptor(wdi::D3D11X_DESCRIPTOR_RESOURCE* descriptor) override
@@ -275,7 +276,7 @@ namespace wd
 	class texture_3d : public wdi::ID3D11Texture3D
 	{
 	public:
-		texture_3d(::ID3D11Texture3D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef( ); }
+		texture_3d(::ID3D11Texture3D* texture) : wrapped_interface(texture) { wrapped_interface->AddRef(); }
 
 		IGU_DEFINE_REF
 
@@ -284,7 +285,7 @@ namespace wd
 			if (riid == __uuidof(wdi::ID3D11Texture3D))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -341,9 +342,9 @@ namespace wd
 			wrapped_interface->SetEvictionPriority(EvictionPriority);
 		}
 
-		UINT GetEvictionPriority( ) override
+		UINT GetEvictionPriority() override
 		{
-			return wrapped_interface->GetEvictionPriority( );
+			return wrapped_interface->GetEvictionPriority();
 		}
 
 		void GetDescriptor(wdi::D3D11X_DESCRIPTOR_RESOURCE* descriptor) override
@@ -357,7 +358,7 @@ namespace wd
 	class buffer : public wdi::ID3D11Buffer
 	{
 	public:
-		buffer(::ID3D11Buffer* buffer) : wrapped_interface(buffer) { wrapped_interface->AddRef( ); }\
+		buffer(::ID3D11Buffer* buffer) : wrapped_interface(buffer) { wrapped_interface->AddRef(); }\
 
 		IGU_DEFINE_REF
 
@@ -366,7 +367,7 @@ namespace wd
 			if (riid == __uuidof(wdi::ID3D11Buffer))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 			TRACE_INTERFACE_NOT_HANDLED("buffer");
@@ -422,9 +423,9 @@ namespace wd
 			wrapped_interface->SetEvictionPriority(EvictionPriority);
 		}
 
-		UINT GetEvictionPriority( ) override
+		UINT GetEvictionPriority() override
 		{
-			return wrapped_interface->GetEvictionPriority( );
+			return wrapped_interface->GetEvictionPriority();
 		}
 
 		void GetDescriptor(wdi::D3D11X_DESCRIPTOR_RESOURCE* descriptor) override

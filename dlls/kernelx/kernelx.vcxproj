@@ -47,13 +47,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(IncludePath);$(ProjectDir)\..\..\thirdparty\Detours\include</IncludePath>
+    <IncludePath>$(IncludePath);$(ProjectDir)\..\..\thirdparty\Detours\include;$(SolutionDir)dlls\common;</IncludePath>
     <LibraryPath>$(LibraryPath);$(ProjectDir)\..\..\thirdparty\Detours\lib.X64;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(IncludePath);$(ProjectDir)\..\..\thirdparty\Detours\include</IncludePath>
+    <IncludePath>$(IncludePath);$(ProjectDir)\..\..\thirdparty\Detours\include;$(SolutionDir)dlls\common;</IncludePath>
     <LibraryPath>$(LibraryPath);$(ProjectDir)\..\..\thirdparty\Detours\lib.X64;</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,6 +123,9 @@
     <ClCompile Include="CoreApplicationWrapperX.cpp" />
     <ClCompile Include="CoreWindowWrapperX.cpp" />
     <ClCompile Include="CurrentAppWrapper.cpp" />
+    <ClCompile Include="..\common\LoggerCrash.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="FrameworkViewSourceWrapper.cpp" />
     <ClCompile Include="FrameworkViewWrapper.cpp" />
@@ -138,8 +141,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
-    <None Include="cpp.hint" />
     <None Include="Exports.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

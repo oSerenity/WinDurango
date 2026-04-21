@@ -1,64 +1,43 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
+#include <d3d11.h>
 #include <d3d11_1.h>
 #include <d3d11_2.h>
+
 #include "device_context_x.h"
-#include <stdexcept>
 #include "view.hpp"
-#include <d3d11.h>
-#include <cassert>
-#include <cstdio>
-#include "../common/Logger.h"
 
 void wd::device_context_x::GetDevice(ID3D11Device** ppDevice)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::GetPrivateData(const GUID& guid, UINT* pDataSize, void* pData)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::SetPrivateData(const GUID& guid, UINT DataSize, const void* pData)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::SetPrivateDataInterface(const GUID& guid, const IUnknown* pData)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::SetPrivateDataInterfaceGraphics(const GUID& guid, const IGraphicsUnknown* pData)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::SetName(LPCWSTR pName)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
@@ -81,7 +60,7 @@ void wd::device_context_x::VSSetConstantBuffers(UINT StartSlot, UINT NumBuffers,
 
 void wd::device_context_x::Draw(UINT VertexCount, UINT StartVertexLocation)
 {
-	ProcessDirtyFlags( );
+	ProcessDirtyFlags();
 	wrapped_interface->Draw(VertexCount, StartVertexLocation);
 }
 
@@ -128,7 +107,7 @@ void wd::device_context_x::PSSetConstantBuffers(UINT StartSlot, UINT NumBuffers,
 			{
 				auto wrapped = static_cast<wd::buffer*>(wdi_buf);
 				buffers[ i ] = wrapped->wrapped_interface;
-				wdi_buf->Release( );
+				wdi_buf->Release();
 			}
 			else
 			{
@@ -249,7 +228,7 @@ void wd::device_context_x::GSSetShaderResources(ID3D11ShaderResourceView* const*
 
 void wd::device_context_x::DrawAuto()
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
@@ -524,7 +503,7 @@ void wd::device_context_x::GenerateMips(ID3D11ShaderResourceView* pShaderResourc
 		{
 			auto wrapped = static_cast<wd::shader_resource_view*>(wdi_srv);
 			unwrappedSRV = wrapped->wrapped_interface;
-			wdi_srv->Release( );
+			wdi_srv->Release();
 		}
 		else
 		{
@@ -618,7 +597,7 @@ void wd::device_context_x::CSSetUnorderedAccessViews(
 			{
 				auto wrapped = static_cast<wd::unordered_access_view*>(wdi_uav);
 				unwrappedUAVs[ i ] = wrapped->wrapped_interface;
-				wdi_uav->Release( );
+				wdi_uav->Release();
 			}
 			else
 			{
@@ -1158,81 +1137,83 @@ INT wd::device_context_x::PIXBeginEventEx(const void* pData, UINT DataSize)
 
 INT wd::device_context_x::PIXEndEvent()
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::PIXSetMarker(LPCWSTR Name)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::PIXSetMarkerEx(const void* pData, UINT DataSize)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 BOOL wd::device_context_x::PIXGetStatus()
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::PIXGpuCaptureNextFrame(UINT Flags, LPCWSTR lpOutputFileName)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::PIXGpuBeginCapture(UINT Flags, LPCWSTR lpOutputFileName)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::PIXGpuEndCapture()
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::StartCounters(wdi::ID3D11CounterSetX* pCounterSet)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::SampleCounters(wdi::ID3D11CounterSampleX* pCounterSample)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::StopCounters()
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 HRESULT wd::device_context_x::GetCounterData(wdi::ID3D11CounterSampleX* pCounterSample, wdi::D3D11X_COUNTER_DATA* pData,
 	UINT GetCounterDataFlags)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::FlushGpuCaches(ID3D11Resource* pResource)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	throw std::logic_error("Not implemented");
 }
 
 void wd::device_context_x::FlushGpuCacheRange(UINT Flags, void* pBaseAddress, SIZE_T SizeInBytes)
 {
-	LOG_NOT_IMPLEMENTED( );
-	throw std::logic_error("Not implemented");
+	if (!wrapped_interface)
+		return;
+
+	wrapped_interface->Flush();
 }
 
 void wd::device_context_x::InsertWaitUntilIdle(UINT Flags)
@@ -1243,8 +1224,9 @@ void wd::device_context_x::InsertWaitUntilIdle(UINT Flags)
 
 UINT64 wd::device_context_x::InsertFence(UINT Flags)
 {
-	LOG_NOT_IMPLEMENTED();
-	throw std::logic_error("Not implemented");
+	static UINT64 fence = 1;
+
+	return fence++;
 }
 
 void wd::device_context_x::InsertWaitOnFence(UINT Flags, UINT64 Fence)
@@ -1488,8 +1470,12 @@ void wd::device_context_x::IASetPlacementVertexBuffer(UINT Slot, ID3D11Buffer* p
 void wd::device_context_x::IASetPlacementIndexBuffer(UINT HardwareIndexFormat, ID3D11Buffer* pIndexBuffer,
 	void* pBaseAddress)
 {
-		LOG_NOT_IMPLEMENTED();
-		throw std::logic_error("Not implemented");
+	if (pIndexBuffer) {
+		DXGI_FORMAT format = (HardwareIndexFormat == 16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+		wrapped_interface->IASetIndexBuffer(pIndexBuffer, format, 0);
+	} else {
+		wrapped_interface->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+	}
 }
 
 void wd::device_context_x::HSSetTessellationParameters(
@@ -1580,8 +1566,8 @@ void wd::device_context_x::OMSetSampleMask(UINT64 QuadSampleMask)
 
 UINT32* wd::device_context_x::MakeCeSpace()
 {
-		LOG_NOT_IMPLEMENTED();
-		throw std::logic_error("Not implemented");
+	static UINT32 ceSpace[ 4 ] = { 0 };
+	return ceSpace;
 }
 
 void wd::device_context_x::SetFastResources_Debug(UINT* pTableStart, UINT* pTableEnd)
@@ -1678,13 +1664,34 @@ void wd::device_context_x::SetShaderResourceViewMinLOD(ID3D11ShaderResourceView*
 
 void wd::device_context_x::InsertWaitOnPresent(UINT Flags, ID3D11Resource* pBackBuffer)
 {
-		LOG_NOT_IMPLEMENTED();
-		throw std::logic_error("Not implemented");
+	if (!pBackBuffer) return;
+
+	D3D11_QUERY_DESC queryDesc = {};
+	queryDesc.Query = D3D11_QUERY_EVENT;
+	queryDesc.MiscFlags = 0;
+
+	ID3D11Query* pEventQuery = nullptr;
+	ID3D11Device* dev;
+	wrapped_interface->GetDevice(&dev);
+	HRESULT hr = dev->CreateQuery(&queryDesc, &pEventQuery);
+	if (FAILED(hr) || !pEventQuery) {
+		return;
+	}
+
+	wrapped_interface->End(pEventQuery);
+
+	while (S_FALSE == wrapped_interface->GetData(pEventQuery, nullptr, 0, 0))
+	{
+		Sleep(0);
+	}
+
+	pEventQuery->Release( );
 }
 
 void wd::device_context_x::ClearRenderTargetViewX(ID3D11RenderTargetView* pRenderTargetView, UINT Flags,
 												  const FLOAT ColorRGBA[ 4 ])
 {
+	return;
 	if (!pRenderTargetView)
 	{
 		LOG_ERROR("[ClearRenderTargetViewX] ERROR: pRenderTargetView is null!\n");
@@ -1724,8 +1731,29 @@ void wd::device_context_x::DecompressResource(ID3D11Resource* pDstResource, UINT
 	const wdi::D3D11X_POINT* pDstPoint, ID3D11Resource* pSrcResource, UINT SrcSubresource,
 	const wdi::D3D11X_RECT* pSrcRect, DXGI_FORMAT DecompressFormat, UINT DecompressFlags)
 {
-		LOG_NOT_IMPLEMENTED();
-		throw std::logic_error("Not implemented");
+	if (!pDstResource || !pSrcResource)
+		return;
+
+	if (pDstResource == pSrcResource && DstSubresource == SrcSubresource)
+	{
+		// TODO: This is for in-place decompress
+		return;
+	}
+
+	D3D11_BOX box;
+	box.left = pSrcRect ? pSrcRect->left : 0;
+	box.top = pSrcRect ? pSrcRect->top : 0;
+	box.front = 0;
+	box.right = pSrcRect ? pSrcRect->right : 0;
+	box.bottom = pSrcRect ? pSrcRect->bottom : 0;
+	box.back = 1;
+
+	UINT dstX = pDstPoint ? pDstPoint->x : 0;
+	UINT dstY = pDstPoint ? pDstPoint->y : 0;
+	UINT dstZ = 0;
+
+	wrapped_interface->CopySubresourceRegion(pDstResource, DstSubresource, dstX, dstY, dstZ, pSrcResource, SrcSubresource, &box);
+	// TODO: Actually Decompress - C
 }
 
 void wd::device_context_x::DecompressResourceX(wdi::D3D11X_DESCRIPTOR_RESOURCE* pDstResource, UINT DstSubresource,
@@ -1877,7 +1905,7 @@ void wd::device_context_x::CSSetShaderUserData(UINT StartSlot, UINT NumRegisters
 void wd::device_context_x::InsertWaitOnMemory(const void* pAddress, UINT Flags,
 	D3D11_COMPARISON_FUNC ComparisonFunction, UINT ReferenceValue, UINT Mask)
 {
-	LOG_NOT_IMPLEMENTED( );
+	LOG_NOT_IMPLEMENTED();
 	// FIXME: implement, stubbing this seems to be fine for now
 }
 
@@ -2041,7 +2069,7 @@ void wd::device_context_x::DrawIndexed(UINT64 StartIndexLocationAndIndexCount, I
 	UINT StartIndexLocation = static_cast<UINT>(StartIndexLocationAndIndexCount & 0xFFFFFFFF);
 	UINT IndexCount = static_cast<UINT>((StartIndexLocationAndIndexCount >> 32) & 0xFFFFFFFF);
 
-	ProcessDirtyFlags( );
+	ProcessDirtyFlags();
 	wrapped_interface->DrawIndexed(IndexCount, StartIndexLocation, BaseVertexLocation);
 }
 
@@ -2069,7 +2097,7 @@ void wd::device_context_x::DrawIndexedInstanced(UINT64 StartIndexLocationAndInde
 	UINT StartInstanceLocation = static_cast<UINT>((BaseVertexLocationAndStartInstanceLocation >> 32) &
 		0xFFFFFFFF);
 
-	ProcessDirtyFlags( );
+	ProcessDirtyFlags();
 	wrapped_interface->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation,
 										  BaseVertexLocation, StartInstanceLocation);
 }
@@ -2081,7 +2109,7 @@ void wd::device_context_x::DrawInstanced(UINT VertexCountPerInstance,
 	UINT StartInstanceLocation = static_cast<UINT>((StartVertexLocationAndStartInstanceLocation >> 32) &
 		0xFFFFFFFF);
 
-	ProcessDirtyFlags( );
+	ProcessDirtyFlags();
 	wrapped_interface->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation,
 								   StartInstanceLocation);
 }

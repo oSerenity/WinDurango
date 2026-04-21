@@ -1,4 +1,6 @@
 #pragma once
+#include <common.h>
+
 #include <windows.networking.connectivity.h>
 
 using namespace ABI::Windows::Networking::Connectivity;

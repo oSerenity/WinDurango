@@ -1,34 +1,48 @@
 #pragma once
 #include "Windows.Xbox.Input.Gamepad.g.h"
+
+#include "WinDurangoConfig.h"
+
 #include <Xinput.h>
+#include <windows.h>
+#include <winrt/Windows.UI.Core.h>
 
 namespace winrt::Windows::Xbox::Input::implementation
 {
     struct Gamepad : GamepadT<Gamepad>
     {
         Gamepad() = default;
-        Gamepad(uint64_t id) : m_id(id) {}
+        Gamepad(uint64_t id, bool isStub = false);
 
-        static winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Input::IGamepad> Gamepads();
-        static winrt::event_token GamepadAdded(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::GamepadAddedEventArgs> const& handler);
-        static void GamepadAdded(winrt::event_token const& token) noexcept;
-        static winrt::event_token GamepadRemoved(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::GamepadRemovedEventArgs> const& handler);
-        static void GamepadRemoved(winrt::event_token const& token) noexcept;
+        static Foundation::Collections::IVectorView<IGamepad> Gamepads();
+        static event_token GamepadAdded(Foundation::EventHandler<GamepadAddedEventArgs> const& handler);
+        static void GamepadAdded(event_token const& token) noexcept;
+        static event_token GamepadRemoved(Foundation::EventHandler<GamepadRemovedEventArgs> const& handler);
+        static void GamepadRemoved(event_token const& token) noexcept;
         uint64_t Id();
         hstring Type();
-        winrt::Windows::Xbox::System::User User();
-        winrt::Windows::Xbox::Input::INavigationReading GetNavigationReading();
-        winrt::Windows::Xbox::Input::RawNavigationReading GetRawNavigationReading();
-        winrt::event_token NavigationReadingChanged(winrt::Windows::Foundation::TypedEventHandler<winrt::Windows::Xbox::Input::NavigationController, winrt::Windows::Xbox::Input::INavigationReadingChangedEventArgs> const& handler);
-        void NavigationReadingChanged(winrt::event_token const& token) noexcept;
-        void SetVibration(winrt::Windows::Xbox::Input::GamepadVibration const& value);
-        winrt::Windows::Xbox::Input::IGamepadReading GetCurrentReading();
-        winrt::Windows::Xbox::Input::RawGamepadReading GetRawCurrentReading();
-        winrt::event_token ReadingChanged(winrt::Windows::Foundation::TypedEventHandler<winrt::Windows::Xbox::Input::Gamepad, winrt::Windows::Xbox::Input::IGamepadReadingChangedEventArgs> const& handler);
-        void ReadingChanged(winrt::event_token const& token) noexcept;
+        System::User User();
+        INavigationReading GetNavigationReading();
+        RawNavigationReading GetRawNavigationReading();
+        event_token NavigationReadingChanged(Foundation::TypedEventHandler<NavigationController, INavigationReadingChangedEventArgs> const& handler);
+        void NavigationReadingChanged(event_token const& token) noexcept;
+        void SetVibration(GamepadVibration const& value);
+        IGamepadReading GetCurrentReading();
+        RawGamepadReading GetRawCurrentReading();
+        event_token ReadingChanged(Foundation::TypedEventHandler<Input::Gamepad, IGamepadReadingChangedEventArgs> const& handler);
+        void ReadingChanged(event_token const& token) noexcept;
         bool IsTrusted();
-        inline static winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Xbox::Input::IGamepad> staticGamepads = { nullptr };
         uint64_t m_id{ 0 };
+        bool m_isStub{ false };
+        RawGamepadReading reading = {};
+        POINT prev{ 0, 0 };
+        float deltaSumX = 0.0f;
+        float deltaSumY = 0.0f;
+        bool firstFrame = true;
+        bool m_loggedId = false;
+        WORD m_lastLoggedButtonMask = 0xFFFF;
+        WinDurangoConfig& config;
+        inline static winrt::event<Windows::Foundation::EventHandler<GamepadAddedEventArgs>> m_gamepadAdded;
 
         inline static std::pair<WORD, GamepadButtons> const gamepadButtons[] =
         {
@@ -48,7 +62,7 @@ namespace winrt::Windows::Xbox::Input::implementation
             { XINPUT_GAMEPAD_Y, GamepadButtons::Y },
         };
         
-        inline static std::pair<WORD, GamepadButtons> const keyboardButtons[] =
+        inline static std::pair<WORD, GamepadButtons> keyboardButtons[] =
         {
             { VK_UP, GamepadButtons::DPadUp },
             { VK_DOWN, GamepadButtons::DPadDown },
@@ -56,17 +70,18 @@ namespace winrt::Windows::Xbox::Input::implementation
             { VK_RIGHT, GamepadButtons::DPadRight },
             { VK_RETURN, GamepadButtons::Menu },
             { VK_ESCAPE, GamepadButtons::View },
-            { VK_LSHIFT, GamepadButtons::LeftThumbstick },
-            { VK_RSHIFT, GamepadButtons::RightThumbstick },
+            { VK_RSHIFT, GamepadButtons::LeftThumbstick },
+            { VK_LSHIFT, GamepadButtons::RightThumbstick },
             { VK_LCONTROL, GamepadButtons::LeftShoulder },
             { VK_RCONTROL, GamepadButtons::RightShoulder },
-            { 'A', GamepadButtons::A },
-            { 'B', GamepadButtons::B},
-            { 'X', GamepadButtons::X },
-            { 'Y', GamepadButtons::Y},
+            { VK_SPACE, GamepadButtons::A },
+            { 'Q', GamepadButtons::B},
+            { 'R', GamepadButtons::X},
+            { 'E', GamepadButtons::Y},
         };
     };
 }
+
 namespace winrt::Windows::Xbox::Input::factory_implementation
 {
     struct Gamepad : GamepadT<Gamepad, implementation::Gamepad>

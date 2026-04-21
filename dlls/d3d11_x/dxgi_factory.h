@@ -1,22 +1,6 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
 #pragma once
+#include <common.h>
+
 #include "dxgi_object.hpp"
 
 namespace wdi
@@ -55,7 +39,7 @@ namespace wdi
 			UINT Adapter,
 			IDXGIAdapter1** ppAdapter) PURE;
 
-		virtual BOOL STDMETHODCALLTYPE IsCurrent( ) PURE;
+		virtual BOOL STDMETHODCALLTYPE IsCurrent() PURE;
 	};
 
 	D3DINTERFACE(IDXGIFactory2, 50c83a1c, e072, 4c48, 87, b0, 36, 30, fa, 36, a6, d0) : public IDXGIFactory1
@@ -116,7 +100,7 @@ namespace wd {
 	class dxgi_factory : public wdi::IDXGIFactory2
 	{
 	public:
-        dxgi_factory(::IDXGIFactory2* factory) : wrapped_interface(factory) { wrapped_interface->AddRef( ); }
+        dxgi_factory(::IDXGIFactory2* factory) : wrapped_interface(factory) { wrapped_interface->AddRef(); }
 
         IGU_DEFINE_REF
 
@@ -126,7 +110,7 @@ namespace wd {
 				riid == __uuidof(wdi::IDXGIFactory2))
 			{
 				*ppvObject = this;
-				AddRef( );
+				AddRef();
 				return S_OK;
 			}
 
@@ -170,4 +154,3 @@ private:
         ::IDXGIFactory2* wrapped_interface;
 	};
 }
-

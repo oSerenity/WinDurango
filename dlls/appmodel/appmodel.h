@@ -10,6 +10,8 @@
 #define APPMODEL_API __declspec(dllimport)
 #endif
 
+#include <common.h>
+
 // This class is exported from the dll
 class APPMODEL_API Cappmodel {
 public:

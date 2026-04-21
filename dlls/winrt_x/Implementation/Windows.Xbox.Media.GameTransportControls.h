@@ -33,7 +33,12 @@ namespace winrt::Windows::Xbox::Media::implementation
 		void PropertyChanged(winrt::event_token const& token) noexcept;
 
 	private:
+		void RaisePropertyChanged(winrt::Windows::Xbox::Media::GameTransportControlsProperty property);
+
+		hstring m_title{};
+		hstring m_subtitle{};
 		GamePlaybackStatus m_gamePlaybackStatus = GamePlaybackStatus::Closed;
+		winrt::Windows::Xbox::Media::SoundLevel m_soundLevel = SoundLevel::Muted;
 		bool m_enabled = false;
 		bool m_playEnabled = false;
 		bool m_pauseEnabled = false;

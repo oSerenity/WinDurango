@@ -3,7 +3,8 @@
 
 namespace wdi
 {
-	D3DINTERFACE(IDXGIObject, aec22fb8, 76f3, 4639, 9b, e0, 28, eb, 43, a6, 7a, 2e) : public wd::graphics_unknown {
+	D3DINTERFACE(IDXGIObject, aec22fb8, 76f3, 4639, 9b, e0, 28, eb, 43, a6, 7a, 2e) : public wd::graphics_unknown 
+	{
 		public: void* m_pPrivateData;
 
 		virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID Name, UINT DataSize, const void* pData) = 0;
@@ -13,7 +14,8 @@ namespace wdi
 	};
 }
 
-namespace wd {
+namespace wd 
+{
 	class dxgi_object : public wdi::IDXGIObject
 	{
 	public:
@@ -27,7 +29,17 @@ namespace wd {
 			return E_NOTIMPL;
 		}
 
+		HRESULT SetPrivateDataInterfaceGraphics(const GUID& Name, const IUnknown* pUnknown) {
+			TRACE_NOT_IMPLEMENTED("dxgi_object");
+			return E_NOTIMPL;
+		}
+
 		HRESULT GetPrivateData(const GUID& Name, UINT* pDataSize, void* pData) override {
+			TRACE_NOT_IMPLEMENTED("dxgi_object");
+			return E_NOTIMPL;
+		}
+
+		HRESULT GetParent(const GUID& riid, void** ppParent) override {
 			TRACE_NOT_IMPLEMENTED("dxgi_object");
 			return E_NOTIMPL;
 		}

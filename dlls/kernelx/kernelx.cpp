@@ -236,7 +236,7 @@ void GetSystemOSVersion_X(LPSYSTEMOSVERSIONINFO VersionInformation) {
 
 
 CONSOLE_TYPE GetConsoleType_X() {
-    return CONSOLE_TYPE::CONSOLE_TYPE_XBOX_ONE_X_DEVKIT;
+    return CONSOLE_TYPE::CONSOLE_TYPE_XBOX_ONE_X;
 }
 
 PVOID XMemAllocDefault_X(SIZE_T dwSize, uint64_t flags) {
@@ -305,9 +305,6 @@ NTSTATUS __fastcall XMemSetAllocationHooks_X(PVOID(__fastcall* XMemAlloc)(SIZE_T
 #define PROTECT_FLAGS_MASK (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY | PAGE_NOACCESS | PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_GUARD | PAGE_NOCACHE)
 #define ALLOCATION_FLAGS_MASK (MEM_COMMIT | MEM_RESERVE | MEM_RESET | MEM_LARGE_PAGES | MEM_PHYSICAL | MEM_TOP_DOWN | MEM_WRITE_WATCH)
 
-#define PROTECT_FLAGS_MASK 0xFF
-#define ALLOCATION_FLAGS_MASK 0xFFFFF
-
 bool EnableDebugPrivilege() {
     HANDLE hToken;
     TOKEN_PRIVILEGES tp;
@@ -338,21 +335,31 @@ LPVOID VirtualAllocEx_X(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD 
 
     printf("VirtualAllocEx_X: %p, %zu, %x, %x\n", lpAddress, dwSize, flAllocationType, flProtect);
 
-    LPVOID ret = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
+    DWORD allocTry = flAllocationType;
+    LPVOID ret = VirtualAllocEx(hProcess, lpAddress, dwSize, allocTry, flProtect);
+
+    // Xbox titles often pass MEM_LARGE_PAGES; on desktop that requires "lock pages in memory"
+    // (SeLockMemoryPrivilege) and fails with ERROR_PRIVILEGE_NOT_HELD (1314) for most users.
+    if (!ret && (allocTry & (MEM_LARGE_PAGES | MEM_PHYSICAL))) {
+        allocTry &= ~(MEM_LARGE_PAGES | MEM_PHYSICAL);
+        printf("VirtualAllocEx_X: retry without MEM_LARGE_PAGES|MEM_PHYSICAL (%x)\n", allocTry);
+        ret = VirtualAllocEx(hProcess, lpAddress, dwSize, allocTry, flProtect);
+    }
+
     if (!ret) {
         DWORD err = GetLastError();
         printf("VirtualAllocEx failed with error %lu\n", err);
 
         if (err == ERROR_PRIVILEGE_NOT_HELD) {
-            printf("VirtualAllocEx failed due to missing privileges (SeDebugPrivilege).\n");
+            printf("VirtualAllocEx: ERROR_PRIVILEGE_NOT_HELD (e.g. MEM_LARGE_PAGES without lock-pages, "
+                   "or remote process without debug privilege).\n");
         }
 
-        // Fallback only if allocating into self
         if (hProcess == GetCurrentProcess() || hProcess == NULL) {
             printf("Attempting fallback with VirtualAlloc...\n");
 
-            if ((flAllocationType & (MEM_RESERVE | MEM_COMMIT)) != 0) {
-                ret = VirtualAlloc(lpAddress, dwSize, flAllocationType, flProtect);
+            if ((allocTry & (MEM_RESERVE | MEM_COMMIT)) != 0) {
+                ret = VirtualAlloc(lpAddress, dwSize, allocTry, flProtect);
                 if (!ret) {
                     DWORD fallbackErr = GetLastError();
                     printf("VirtualAlloc fallback also failed: %lu\n", fallbackErr);
@@ -361,7 +368,6 @@ LPVOID VirtualAllocEx_X(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD 
         }
     }
 
-    // Final safety: log if still null
     if (!ret) {
         printf("VirtualAllocEx_X ultimately failed to allocate %zu bytes.\n", dwSize);
     }
@@ -408,10 +414,10 @@ BOOL TitleMemoryStatus_X(LPTITLEMEMORYSTATUS Buffer)
 {
     __int64 ProcessInformation[10]; // [rsp+30h] [rbp-68h] BYREF
 
-    if (Buffer->dwLength != 80)
+    if (!Buffer || Buffer->dwLength != sizeof(TITLEMEMORYSTATUS))
     {
-        SetLastError(0x57u);
-        return false;
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
     }
 
     NTSTATUS Status = NtQueryInformationProcess(
@@ -427,23 +433,19 @@ BOOL TitleMemoryStatus_X(LPTITLEMEMORYSTATUS Buffer)
         return FALSE;
     }
 
+    /* Mirror JobTitleMemoryStatus_X mapping: total/used, legacy, title current vs peak. */
     Buffer->ullTotalMem = ProcessInformation[0];
     Buffer->ullAvailMem = ProcessInformation[0] - ProcessInformation[1];
-
     Buffer->ullLegacyUsed = ProcessInformation[2];
-    Buffer->ullAvailMem = ProcessInformation[4] - ProcessInformation[2];
-
+    Buffer->ullLegacyPeak = ProcessInformation[3];
+    Buffer->ullLegacyAvail = ProcessInformation[4] - ProcessInformation[2];
     Buffer->ullTitleUsed = ProcessInformation[5];
-    Buffer->ullTitleUsed = ProcessInformation[5] - ProcessInformation[6];
+    Buffer->ullTitleAvail = ProcessInformation[6] - ProcessInformation[5];
 
-    //// @Patoke todo: what is this doing? it's writing outside the bounds of TITLEMEMORYSTATUS
-    //*(DWORD*)((uint8_t*)Buffer + 64) = ProcessInformation[7];
-    //*(DWORD*)((uint8_t*)Buffer + 72) = ProcessInformation[8];
-
-    // equivalent to the previous code
-    auto* nextBuffer = Buffer++;
-    nextBuffer->dwLength = ProcessInformation[7];
-    nextBuffer->dwReserved = ProcessInformation[8];
+    Buffer->ExtensionDword64 = static_cast<DWORD>(ProcessInformation[7]);
+    Buffer->Reserved68 = 0;
+    Buffer->ExtensionDword72 = static_cast<DWORD>(ProcessInformation[8]);
+    Buffer->Reserved76 = 0;
 
     return TRUE;
 }

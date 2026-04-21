@@ -5,11 +5,12 @@ class FrameworkViewWrapper : public IFrameworkView
 {
 public:
 
-	FrameworkViewWrapper(IFrameworkView* windowView)
+	explicit FrameworkViewWrapper(IFrameworkView* windowView)
 		: m_realView(windowView)
 	{
-
 	}
+
+	~FrameworkViewWrapper();
 
 
 	HRESULT STDMETHODCALLTYPE Initialize(ABI::Windows::ApplicationModel::Core::ICoreApplicationView* applicationView) override;

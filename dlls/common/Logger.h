@@ -25,11 +25,19 @@ If you do not agree to these terms, you do not have permission to use this code.
 #include <fstream>
 #include <iostream>
 #include <ctime>
+#include <io.h>
+#include <stdio.h>
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Storage.h>
 #include <windows.h>
+#include <fcntl.h>
 #include <source_location> // C++20 support
 
 #ifndef DEBUG_LOGGER_H
 #define DEBUG_LOGGER_H
+
+#include "LoggerCrash.h"
 
 #if defined(__GNUC__) || defined(__clang__)
 #define FUNCTION_NAME __PRETTY_FUNCTION__
@@ -60,20 +68,42 @@ private:
     static inline std::mutex logMutex;
     static inline LoggerConfig config;
 
-    static std::string GenerateLogFileName( ) {
+    static std::string GenerateLogFileName() {
         auto t = std::time(nullptr);
         std::tm tm{};
         localtime_s(&tm, &t);
         char buf[ 64 ];
-        std::strftime(buf, sizeof(buf), "debug_%Y-%m-%d_%H-%M-%S.log", &tm);
+        std::strftime(buf, sizeof(buf), "debug_%Y-%m-%d_%H.log", &tm);
         return buf;
     }
-    static inline std::ofstream logFile{ GenerateLogFileName( ), std::ios::app };
+    static std::wstring WideString(const std::string& str) {
+        if (str.empty()) return L"";
 
-    static inline std::string FormatString(const char* fmt, va_list args) {
-        char buffer[ 1024 ];
-        vsnprintf(buffer, sizeof(buffer), fmt, args);
-        return std::string(buffer);
+        int siz = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), nullptr, 0);
+        std::wstring wstr(siz, 0);
+
+        MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), wstr.data(), siz);
+        return wstr;
+    }
+    static std::ofstream OpenUwpLog() {
+        auto localFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+        std::wstring logPath = localFolder.Path().c_str() + std::wstring(L"\\") + WideString(GenerateLogFileName());
+        std::ofstream logFile(logPath, std::ios::app);
+        return logFile;
+    }
+    static inline std::ofstream logFile;
+
+    static inline std::string FormatString(const char* fmt, va_list args)
+    {
+        va_list argsCopy;
+        va_copy(argsCopy, args);
+
+        int len = vsnprintf(nullptr, 0, fmt, argsCopy);
+        va_end(argsCopy);
+
+        std::string out(len, '\0');
+        vsnprintf(out.data(), len + 1, fmt, args);
+        return out;
     }
 
     static const char* ToString(LogLevel level) {
@@ -88,7 +118,7 @@ private:
         }
     }
 
-    static std::string CurrentTime( ) {
+    static std::string CurrentTime() {
         std::time_t now = std::time(nullptr);
         std::tm timeinfo{};
         char buffer[ 32 ];
@@ -101,7 +131,7 @@ private:
         }
     }
 
-    static std::wstring CurrentTimeW( ) {
+    static std::wstring CurrentTimeW() {
         std::time_t now = std::time(nullptr);
         std::tm timeinfo{};
         wchar_t buffer[ 32 ];
@@ -132,12 +162,51 @@ public:
         va_end(args);
         Logf(level, message, file, line, function);
     }
+
+    static bool IsStdoutValid() {
+        int fd = _fileno(stdout);
+
+        if (fd < 0) {
+            return false;
+        }
+
+        HANDLE h = (HANDLE)_get_osfhandle(fd);
+        if (h == INVALID_HANDLE_VALUE) {
+            return false;
+        }
+
+        DWORD mode;
+
+        return GetConsoleMode(h, &mode) != 0 || h != GetStdHandle(STD_OUTPUT_HANDLE);
+    }
     // -------------------------------
     // Narrow logging (std::string)
     // -------------------------------
     static void Logf(LogLevel level, const std::string& message, const char* file, int line, const char* function) {
+        static bool invalid = false;
+        if (!IsStdoutValid()) {
+            AllocConsole();
+
+            FILE* fp;
+
+            freopen_s(&fp, "CONOUT$", "w", stdout);
+            freopen_s(&fp, "CONOUT$", "w", stderr);
+            freopen_s(&fp, "CONIN$", "r", stdin);
+
+            setvbuf(stdout, nullptr, _IONBF, 0);
+            setvbuf(stderr, nullptr, _IONBF, 0);
+
+            std::ios::sync_with_stdio(true);
+
+            std::cout.clear();
+            std::cerr.clear();
+            std::cin.clear();
+            HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            invalid = true;
+        }
         std::lock_guard<std::mutex> lock(logMutex);
-        std::string timeStr = CurrentTime( );
+        std::string timeStr = CurrentTime();
         std::string func = ExtractFunctionName(function);
         const char* project = ExtractProjectName(file);
         const char* levelStr = ToString(level);
@@ -151,21 +220,41 @@ public:
         }
 
         std::cout << timeStr << " - " << levelStr << " - " << project << " - " << func;
-        if (level == LogLevel::Error || level == LogLevel::Fatal)
+
+        if (level == LogLevel::Error || level == LogLevel::Fatal) {
             std::cout << " - Line " << line;
-        if (!message.empty( ))
+        }
+        if (!message.empty()) {
             std::cout << " - " << message;
-        std::cout << std::endl;
+        }
+        if (invalid) {
+            std::string s = "\n";
+
+            DWORD written;
+            WriteConsoleA(hConsole, s.c_str(), (DWORD)s.size(), &written, nullptr);
+        } else {
+            std::cout << std::endl;
+        }
 
         if (hConsole) SetConsoleTextAttribute(hConsole, originalAttributes);
 
-        if (logFile.is_open( )) {
+        if (logFile.is_open()) {
             logFile << timeStr << " - " << levelStr << " - " << project << " - " << func;
             if (level == LogLevel::Error || level == LogLevel::Fatal)
                 logFile << " - Line " << line;
-            if (!message.empty( ))
+            if (!message.empty())
                 logFile << " - " << message;
             logFile << std::endl;
+        } else {
+            logFile = OpenUwpLog();
+            if (logFile.is_open()) {
+                logFile << timeStr << " - " << levelStr << " - " << project << " - " << func;
+                if (level == LogLevel::Error || level == LogLevel::Fatal)
+                    logFile << " - Line " << line;
+                if (!message.empty())
+                    logFile << " - " << message;
+                logFile << std::endl;
+            }
         }
     }
 
@@ -174,7 +263,7 @@ public:
     // -------------------------------
     static void Log(LogLevel level, const std::wstring& message, const wchar_t* file, int line, const wchar_t* function) {
         std::lock_guard<std::mutex> lock(logMutex);
-        std::wstring timeStr = CurrentTimeW( );
+        std::wstring timeStr = CurrentTimeW();
         std::wstring func = ExtractFunctionNameW(function);
         std::wstring project = ExtractProjectNameW(file);
         std::wstring levelStr = ConvertToWString(ToString(level));
@@ -190,18 +279,18 @@ public:
         std::wcout << timeStr << L" - " << levelStr << L" - " << project << L" - " << func;
         if (level == LogLevel::Error || level == LogLevel::Fatal)
             std::wcout << L" - Line " << line;
-        if (!message.empty( ))
+        if (!message.empty())
             std::wcout << L" - " << message;
         std::wcout << std::endl;
 
         if (hConsole) SetConsoleTextAttribute(hConsole, originalAttributes);
 
         static std::wofstream logFileW{ L"debug_wide.log", std::ios::app };
-        if (logFileW.is_open( )) {
+        if (logFileW.is_open()) {
             logFileW << timeStr << L" - " << levelStr << L" - " << project << L" - " << func;
             if (level == LogLevel::Error || level == LogLevel::Fatal)
                 logFileW << L" - Line " << line;
-            if (!message.empty( ))
+            if (!message.empty())
                 logFileW << L" - " << message;
             logFileW << std::endl;
         }
@@ -213,7 +302,7 @@ public:
         int size = MultiByteToWideChar(CP_UTF8, 0, str, -1, nullptr, 0);
         std::wstring wstr(size, 0);
         MultiByteToWideChar(CP_UTF8, 0, str, -1, &wstr[ 0 ], size);
-        wstr.pop_back( ); // remove null terminator
+        wstr.pop_back(); // remove null terminator
         return wstr;
     }
     static WORD GetColorForProject(const char* projectName) {
@@ -285,15 +374,23 @@ public:
 
     // Extract project name
     static const char* ExtractProjectName(const char* filePath) {
+        if (!filePath || !*filePath)
+            return "UnknownFile";
+
         const char* lastSlash = strrchr(filePath, '/');
         if (!lastSlash) lastSlash = strrchr(filePath, '\\');
+
         const char* fileName = lastSlash ? lastSlash + 1 : filePath;
         const char* dot = strrchr(fileName, '.');
-        static char project[ 256 ];
-        size_t length = dot ? static_cast<size_t>(dot - fileName) : strlen(fileName);
-        length = (length < sizeof(project) - 1) ? length : sizeof(project) - 1;
-        strncpy_s(project, sizeof(project), fileName, length);
-        project[ length ] = '\0';
+
+        static char project[256];
+
+        size_t length = dot ? (size_t)(dot - fileName) : strlen(fileName);
+        if (length >= sizeof(project))
+            length = sizeof(project) - 1;
+
+        memcpy(project, fileName, length);
+        project[length] = '\0';
         return project;
     }
 
@@ -310,6 +407,17 @@ public:
         project[ length ] = L'\0';
         return project;
     }
+
+    // Crash diagnostics (implemented in LoggerCrash.cpp — shared mapping + stack walk).
+    static void InstallCrashDiagnostics() {
+        LoggerCrash::Install();
+    }
+    static void Checkpoint(const char* text) {
+        LoggerCrash::Checkpoint(text);
+    }
+    static void SetCrashModuleHint(const char* dllName) {
+        LoggerCrash::SetModuleHint(dllName);
+    }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -321,6 +429,11 @@ public:
 #define LOG_ERROR(fmt, ...) Logger::Log(LogLevel::Error, __FILE__, __LINE__, FUNCTION_NAME, fmt, ##__VA_ARGS__)
 #define LOG_FATAL(fmt, ...) Logger::Log(LogLevel::Fatal, __FILE__, __LINE__, FUNCTION_NAME, fmt, ##__VA_ARGS__)
 #define LOG_NOT_IMPLEMENTED(...) Logger::NotImplemented(__FILE__, __LINE__, FUNCTION_NAME, ##__VA_ARGS__)
+
+#define LOG_STRINGIZE2(x) #x
+#define LOG_STRINGIZE(x) LOG_STRINGIZE2(x)
+// Records last-known-good location in process-wide storage (see windurango_crash.log on fault).
+#define LOG_CHECKPOINT(msg) Logger::Checkpoint(__FILE__ "(" LOG_STRINGIZE(__LINE__) "): " msg)
 
 // ------------------------------------------------------------------------------------------------
 // Macro-based log wrappers (captures callsite info) WIDE CHARACTER VERSION
@@ -344,7 +457,7 @@ public:
 // Debug-only short macros (auto-disables in Release)
 // ------------------------------------------------------------------------------------------------
 #ifdef _DEBUG
-#define DEBUG_PRINT() printf("Line: %d --> %s --> %s \r\n", __LINE__,ExtractProjectName(__FILE__) ,ExtractFunctionName(FUNCTION_NAME) )
+#define DEBUG_PRINT() printf("Line: %d --> %s --> %s \r\n", __LINE__,ExtractProjectName(__FILE__) ,ExtractFunctionName(FUNCTION_NAME))
 #define DEBUGPRINT(fmt, ...) printf("Line: %d --> %s --> %s " fmt "\r\n", __LINE__ , ExtractProjectName(__FILE__), __FUNCTION__ , ##__VA_ARGS__)
 #else
 #define DEBUG_PRINT()

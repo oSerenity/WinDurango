@@ -4,9 +4,9 @@
 
 namespace winrt::Windows::Xbox::Input::implementation
 {
+
     struct Controller : ControllerT<Controller>
     {
-        Controller() = default;
 
         static winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Input::IController> Controllers();
         static winrt::event_token ControllerAdded(winrt::Windows::Foundation::EventHandler<winrt::Windows::Xbox::Input::ControllerAddedEventArgs> const& handler);
@@ -30,11 +30,13 @@ namespace winrt::Windows::Xbox::Input::implementation
         uint16_t HardwareVendorId();
 
         inline static winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Xbox::Input::IController> staticControllers = { nullptr };
+        inline static winrt::event<Windows::Foundation::EventHandler<ControllerAddedEventArgs>> m_controllerAdded;
     };
 }
 namespace winrt::Windows::Xbox::Input::factory_implementation
 {
     struct Controller : ControllerT<Controller, implementation::Controller>
     {
+
     };
 }

@@ -1,29 +1,9 @@
-/*
-================================================================================
-DISCLAIMER AND LICENSE REQUIREMENT
-
-This code is provided with the condition that if you use, modify, or distribute
-this code in your project, you are required to make your project open source
-under a license compatible with the GNU General Public License (GPL) or a
-similarly strong copyleft license.
-
-By using this code, you agree to:
-1. Disclose your complete source code of any project incorporating this code.
-2. Include this disclaimer in any copies or substantial portions of this file.
-3. Provide clear attribution to the original author.
-
-If you do not agree to these terms, you do not have permission to use this code.
-
-================================================================================
-*/
-#include "d3d11_x.h"
-#include <cstdio>
-#include <mutex>
-#include "overlay/overlay.h"
 #include <d3d11.h>
+
+#include "d3d11_x.h"
+#include "overlay/overlay.h"
 #include "device_context_x.h"
 #include "device_x.h"
-#include "../common/Logger.h"
 
 HRESULT CreateDevice(UINT Flags, wdi::ID3D11Device** ppDevice, wdi::ID3D11DeviceContext** ppImmediateContext)
 {
@@ -59,7 +39,7 @@ HRESULT CreateDevice(UINT Flags, wdi::ID3D11Device** ppDevice, wdi::ID3D11Device
     }
     else
     {
-        LOG_ERROR("failed to assign wrapped device, result code 0x%X, error code 0x%X\n", hr, GetLastError( ));
+        LOG_ERROR("failed to assign wrapped device, result code 0x%X, error code 0x%X\n", hr, GetLastError());
     }
 
     return hr;
@@ -76,7 +56,7 @@ HRESULT __stdcall D3DMapEsramMemory_X(UINT Flags, VOID* pVirtualAddress, UINT Nu
 
     if (hDevice == INVALID_HANDLE_VALUE)
     {
-        DWORD lastError = GetLastError( );
+        DWORD lastError = GetLastError();
         result = HRESULT_FROM_WIN32(lastError);
     }
     else
@@ -174,7 +154,7 @@ HRESULT __stdcall VdMapAddressToEsram(
     }
 
     // If DeviceIoControl fails, retrieve and return the error code
-    DWORD lastError = GetLastError( );
+    DWORD lastError = GetLastError();
     return HRESULT_FROM_WIN32(lastError);
 }
 HRESULT __stdcall DeviceIoControlHelper(HANDLE hDevice)
@@ -192,7 +172,7 @@ HRESULT __stdcall DeviceIoControlHelper(HANDLE hDevice)
     }
 
     // Get last error if DeviceIoControl fails
-    DWORD lastError = GetLastError( );
+    DWORD lastError = GetLastError();
     if (lastError > 0)
     {
         return HRESULT_FROM_WIN32(lastError);
@@ -272,7 +252,7 @@ HRESULT __stdcall D3DConfigureVirtualMemory_X(_Inout_ D3D11X_VIRTUAL_MEMORY_CONF
 
 void __stdcall D3DFlushEntireCpuCache_X()
 {
-    FlushInstructionCache(GetCurrentProcess( ), NULL, NULL);
+    FlushInstructionCache(GetCurrentProcess(), NULL, NULL);
 }
 
 HRESULT __stdcall D3DFreeGraphicsMemory_X(void* pAddress)
@@ -298,8 +278,33 @@ HRESULT _stdcall DXGIXPresentArray_X(
     _In_ IDXGISwapChain1* const* ppSwapChain,
     _In_ const DXGIX_PRESENTARRAY_PARAMETERS* pPresentParameters)
 {
-    LOG_WARNING("[d3d11_x] !!! STUBBED: DXGIXPresentArray !!!");
-    return E_NOTIMPL;
+    if (!ppSwapChain || NumSwapChains == 0) {
+        return E_POINTER;
+    }
+
+    HRESULT hr = S_OK;
+
+    for (UINT i = 0; i < NumSwapChains; ++i) {
+        IDXGISwapChain1* swapChain = ppSwapChain[i];
+        const DXGIX_PRESENTARRAY_PARAMETERS& params = pPresentParameters[i];
+
+        if (!swapChain) {
+            continue;
+        }
+
+        if (params.Disable) {
+            continue;
+        }
+
+        DXGI_PRESENT_PARAMETERS dxgiParams = {};
+        hr = swapChain->Present1(SyncInterval, Flags, &dxgiParams);
+
+        if (FAILED(hr)) {
+            return hr;
+        }
+    }
+
+    return hr;
 }
 
 HRESULT __stdcall DXGIXSetFrameNotification_X(
@@ -369,7 +374,7 @@ HRESULT __stdcall D3D11CreateDevice_X(
     }
     else
     {
-        LOG_ERROR("failed to assign wrapped device, result code 0x%X, error code 0x%X\n", hr, GetLastError( ));
+        LOG_ERROR("failed to assign wrapped device, result code 0x%X, error code 0x%X\n", hr, GetLastError());
     }
 
     return hr;
@@ -420,7 +425,7 @@ void WD11XNotify_X(WDEVENT_TYPE event)
 		throw std::exception("this shouldn't happen, check code that sends events.");
 	case WDEVENT_TYPE_KEYBOARD_ENGAGE:
 		LOG_INFO("[d3d11_x] keyboard engage\n");
-		wd::g_Overlay->EnableKeyboard( );
+		wd::g_Overlay->EnableKeyboard();
 		break;
     }
 }

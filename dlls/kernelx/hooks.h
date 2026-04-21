@@ -302,7 +302,7 @@ HMODULE WINAPI LoadLibraryExA_Hook(LPCSTR lpLibFileName, _Reserved_ HANDLE hFile
 		lpLibFileName = convert.c_str();
 	}
 
-	printf("LoadLibraryExA_Hook-: %s\n", lpLibFileName);
+	//printf("LoadLibraryExA_Hook-: %s\n", lpLibFileName);
 
 
 
@@ -336,7 +336,7 @@ HMODULE WINAPI LoadLibraryW_Hook(LPCWSTR lpLibFileName)
 
 		lpLibFileName = convert.data();
 	}
-	printf("LoadLibraryW_Hook: %ls\n", lpLibFileName);
+	//printf("LoadLibraryW_Hook: %ls\n", lpLibFileName);
 
 	HMODULE result = TrueLoadLibraryW(lpLibFileName);
 	PatchNeededImports(result, GetRuntimeModule(), "?GetActivationFactoryByPCWSTR@@YAJPEAXAEAVGuid@Platform@@PEAPEAX@Z", GetActivationFactoryRedirect);
@@ -431,12 +431,12 @@ inline HRESULT WINAPI RoGetActivationFactory_Hook(HSTRING classId, REFIID iid, v
 	const wchar_t* rawString = WindowsGetStringRawBuffer(classId, nullptr);
 
 	if (wcscmp(rawString, L"Windows.Xbox.Input.Gamepad") != 0 &&
-		wcscmp(rawString, L"Windows.Networking.Connectivity.NetworkInformation") != 0)
+		wcscmp(rawString, L"Windows.Networking.Connectivity.NetworkInformation") != 0 &&
+		wcscmp(rawString, L"Windows.UI.Core.CoreWindow") != 0 &&
+		wcscmp(rawString, L"Windows.ApplicationModel.Core.CoreApplication") != 0)
 	{
 		printf("WinRT Class Activated: %S\n", rawString);
-		// this might be a lil expensive? evaluate later
-		if (wcscmp(rawString, L"Windows.UI.Core.CoreWindow") != 0)
-			wprintf(L"%ls\n", rawString);
+		wprintf(L"%ls\n", rawString);
 	}
 
 
@@ -485,7 +485,12 @@ inline HRESULT WINAPI RoGetActivationFactory_Hook(HSTRING classId, REFIID iid, v
 
 	if (IsClassName(classId, "Windows.ApplicationModel.Core.CoreApplication"))
 	{
-		printf("CLASS: Windows.ApplicationModel.Core.CoreApplication\n");
+		static bool s_loggedCoreApplicationFactory = false;
+		if (!s_loggedCoreApplicationFactory)
+		{
+			s_loggedCoreApplicationFactory = true;
+			printf("CLASS: Windows.ApplicationModel.Core.CoreApplication (further CoreApplication factory activations suppressed)\n");
+		}
 		ComPtr<IActivationFactory> realFactory;
 
 		hr = TrueRoGetActivationFactory(HStringReference(RuntimeClass_Windows_ApplicationModel_Core_CoreApplication).Get(), IID_PPV_ARGS(&realFactory));
@@ -500,7 +505,12 @@ inline HRESULT WINAPI RoGetActivationFactory_Hook(HSTRING classId, REFIID iid, v
 
 	if (IsClassName(classId, "Windows.UI.Core.CoreWindow"))
 	{
-		printf("CLASS: Windows.UI.Core.CoreWindow\n");
+		static bool s_loggedCoreWindowFactory = false;
+		if (!s_loggedCoreWindowFactory)
+		{
+			s_loggedCoreWindowFactory = true;
+			printf("CLASS: Windows.UI.Core.CoreWindow (further CoreWindow factory activations suppressed)\n");
+		}
 		//
 		// for now we just hook GetForCurrentThread to get the CoreWindow but i'll change it later to
 		// wrap ICoreWindowStatic or as zombie said another thing that works is by hooking IFrameworkView::SetWindow
@@ -563,7 +573,9 @@ HRESULT WINAPI GetActivationFactoryRedirect(PCWSTR str, REFIID riid, void** ppFa
 		return hr;
 
 	if (wcscmp(str, L"Windows.Xbox.Input.Gamepad") != 0 &&
-		wcscmp(str, L"Windows.Networking.Connectivity.NetworkInformation") != 0) 
+		wcscmp(str, L"Windows.Networking.Connectivity.NetworkInformation") != 0 &&
+		wcscmp(str, L"Windows.UI.Core.CoreWindow") != 0 &&
+		wcscmp(str, L"Windows.ApplicationModel.Core.CoreApplication") != 0)
 	{
 		printf("GetActivationFactoryRedirect: %S\n", str);
 	}

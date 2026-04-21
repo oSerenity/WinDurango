@@ -1,0 +1,26 @@
+﻿LIBRARY d3d12_x
+EXPORTS
+	D3D12XboxSetProcessDebugFlags =	D3D12XboxSetProcessDebugFlags @1
+	D3D12XboxGetProcessDebugFlags =	D3D12XboxGetProcessDebugFlags @2
+	D3D12GetDebugInterface = D3D12GetDebugInterface @3
+	D3D12XboxCreateDevice =	D3D12XboxCreateDevice	@4
+	D3D12CreateDevice =	D3D12CreateDevice @5
+	D3D12XboxUnloadDriverModule = D3D12XboxUnloadDriverModule @6
+	D3D12SerializeRootSignature = D3D12SerializeRootSignature @7
+	D3D12SerializeVersionedRootSignature = D3D12SerializeVersionedRootSignature @8
+	D3D12CreateRootSignatureDeserializer = D3D12CreateRootSignatureDeserializer @9
+	D3D12CreateVersionedRootSignatureDeserializer =	D3D12CreateVersionedRootSignatureDeserializer @10
+	D3D10CreateBlob = D3D10CreateBlob @11
+	D3DMapEsramMemory =	D3DMapEsramMemory	@12
+	DXGIXPresentArray =	DXGIXPresentArray @13
+	DXGIXGetFrameStatistics = DXGIXGetFrameStatistics @14
+	DXGIXSetVLineNotification =	DXGIXSetVLineNotification	@15
+	DXGIXSetFrameNotification =	DXGIXSetFrameNotification	@16
+	D3DConfigureVirtualMemory = D3DConfigureVirtualMemory @17
+	D3DAllocateGraphicsMemory = D3DAllocateGraphicsMemory @18
+	D3DFreeGraphicsMemory = D3DFreeGraphicsMemory @19
+	D3DUploadCustomMicrocode = D3DUploadCustomMicrocode @20
+	D3DFlushEntireCpuCache = D3DFlushEntireCpuCache @21
+	InternalDriverCallX = InternalDriverCallX @22
+	PixGetPixieEntryPoints = PixGetPixieEntryPoints @23
+	IID_ID3D12Device = IID_ID3D12Device @27

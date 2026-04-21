@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <Shlwapi.h>
 
-
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define RETURN_IF_FAILED(hr) if (FAILED(hr)) return hr

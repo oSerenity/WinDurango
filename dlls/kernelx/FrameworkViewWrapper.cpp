@@ -2,6 +2,15 @@
 #include "FrameworkViewWrapper.h"
 #include <winrt/Windows.Foundation.h>
 
+FrameworkViewWrapper::~FrameworkViewWrapper()
+{
+	if (m_realView)
+	{
+		m_realView->Release();
+		m_realView = nullptr;
+	}
+}
+
 HRESULT __stdcall FrameworkViewWrapper::Initialize(ABI::Windows::ApplicationModel::Core::ICoreApplicationView* applicationView)
 {
     if (!m_realView)
@@ -9,6 +18,12 @@ HRESULT __stdcall FrameworkViewWrapper::Initialize(ABI::Windows::ApplicationMode
         wprintf(L"ERROR: m_realView is null in Initialize()\n");
         return E_POINTER;
     }
+
+	if (!applicationView)
+	{
+		wprintf(L"ERROR: applicationView is null in FrameworkViewWrapper::Initialize (inner view not called)\n");
+		return E_POINTER;
+	}
 
     HRESULT hr = m_realView->Initialize(applicationView);
     if (FAILED(hr))

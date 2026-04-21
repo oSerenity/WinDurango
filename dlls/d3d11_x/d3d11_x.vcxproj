@@ -45,11 +45,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)</TargetName>
-    <IncludePath>$(SolutionDir)thirdparty\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)thirdparty\imgui;$(SolutionDir)dlls\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName)</TargetName>
-    <IncludePath>$(SolutionDir)thirdparty\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)thirdparty\imgui;$(SolutionDir)dlls\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -107,6 +107,7 @@
     <ClCompile Include="device_child_x.cpp" />
     <ClCompile Include="device_context_x.cpp" />
     <ClCompile Include="device_x.cpp" />
+    <ClCompile Include="..\common\LoggerCrash.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dxgi_adapter.cpp" />
     <ClCompile Include="dxgi_device.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="dxgi_factory.h" />
     <ClInclude Include="dxgi_object.hpp" />
     <ClInclude Include="dxgi_swapchain.h" />
+    <ClInclude Include="flags.h" />
     <ClInclude Include="graphics_unknown.h" />
     <ClInclude Include="overlay\overlay.h" />
     <ClInclude Include="resource.hpp" />

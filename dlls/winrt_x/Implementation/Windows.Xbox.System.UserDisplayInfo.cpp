@@ -4,44 +4,67 @@
 
 namespace winrt::Windows::Xbox::System::implementation
 {
-    hstring UserDisplayInfo::Gamertag()
-    {
+	hstring UserDisplayInfo::Gamertag()
+	{
 		LOG_INFO("UserDisplayInfo::Gamertag() called");
-        hstring gamertag = L"durangler" + m_gamertag;
-        return gamertag;
-    }
-    uint32_t UserDisplayInfo::GamerScore()
-    {
-		LOG_INFO("UserDisplayInfo::GamerScore() called");
-        return 0;
-    }
-    hstring UserDisplayInfo::ApplicationDisplayName()
-    {
-        LOG_INFO("UserDisplayInfo::GameDisplayName() called");
-        return winrt::to_hstring("WinDurango");
-    }
-    hstring UserDisplayInfo::GameDisplayName()
-    {
+		
+		return winrt::to_hstring(wdcfg.GetData().gamertag);
+	}
 
+	uint32_t UserDisplayInfo::GamerScore()
+	{
+		LOG_INFO("UserDisplayInfo::GamerScore() called");
+
+		return wdcfg.GetData().gamerscore;
+	}
+
+	hstring UserDisplayInfo::ApplicationDisplayName()
+	{
 		LOG_INFO("UserDisplayInfo::GameDisplayName() called");
-        hstring gamertag = L"durangler" + m_gamertag;
-        return gamertag;
-    }
-    int32_t UserDisplayInfo::Reputation()
-    {
-        LOG_INFO("UserDisplayInfo::Reputation() called");
-        return 1;
-    }
-    winrt::Windows::Xbox::System::UserAgeGroup UserDisplayInfo::AgeGroup()
-    {
+
+		return winrt::to_hstring(wdcfg.GetData().gamertag);
+	}
+
+	hstring UserDisplayInfo::GameDisplayName()
+	{
+		LOG_INFO("UserDisplayInfo::GameDisplayName() called");
+
+		return winrt::to_hstring(wdcfg.GetData().gamertag);
+	}
+
+	int32_t UserDisplayInfo::Reputation()
+	{
+		LOG_INFO("UserDisplayInfo::Reputation() called");
+
+		return wdcfg.GetData().reputation;
+	}
+
+	UserAgeGroup UserDisplayInfo::AgeGroup()
+	{
 		LOG_INFO("UserDisplayInfo::AgeGroup() called");
-        return UserAgeGroup::Unknown;
-    }
-    winrt::Windows::Foundation::Collections::IVectorView<uint32_t> UserDisplayInfo::Privileges()
-    {   
+
+		switch (wdcfg.GetData().ageGroup) {
+			case WinDurangoConfigData::AgeGroup::Adult:
+				return UserAgeGroup::Adult;
+			case WinDurangoConfigData::AgeGroup::Child:
+				return UserAgeGroup::Child;
+			case WinDurangoConfigData::AgeGroup::Teen:
+				return UserAgeGroup::Teen;
+			case WinDurangoConfigData::AgeGroup::Unknown:
+				return UserAgeGroup::Unknown;
+			default:
+				return UserAgeGroup::Unknown;
+		}
+	}
+
+	Foundation::Collections::IVectorView<uint32_t> UserDisplayInfo::Privileges()
+	{   
 		LOG_INFO("UserDisplayInfo::Privileges() called");
-        auto vector = winrt::single_threaded_vector<uint32_t>();
-        vector.Append(1);
-        return vector.GetView();
-    }
+
+		const auto vector = winrt::single_threaded_vector<uint32_t>();
+
+		vector.Append(1);
+
+		return vector.GetView();
+	}
 }
